@@ -242,46 +242,42 @@
       frame();
     })();
 
-    // --- BACKGROUND MUSIC: robust start logic ---
+    // --- BACKGROUND MUSIC: robust start logic with muted autoplay then unmute ---
     (function(){
       const audio = document.getElementById('bgm');
       const btn = document.getElementById('sound-on');
       if(!audio) return;
-      audio.volume = 0.45; // background level
 
-      let started = false;
-      const tryPlay = () => {
-        if (started) return;
-        audio.play().then(()=>{
-          started = true;
-          btn.style.display = 'none';
-        }).catch(()=>{
-          // if blocked, show the manual button
-          btn.style.display = 'inline-flex';
-        });
+      // Start silently (autoplay allowed), then unmute on first gesture
+      audio.volume = 0.0; // start silent
+      const ensurePlaying = () => audio.play().catch(()=>{});
+      // try immediately
+      if (document.visibilityState === 'visible') ensurePlaying();
+      document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') ensurePlaying(); });
+
+      const unmute = () => {
+        audio.muted = false;
+        audio.volume = 0.45;
+        ensurePlaying();
+        btn.style.display = 'none';
+        // remove listeners after first success
+        window.removeEventListener('pointerdown', unmute);
+        window.removeEventListener('touchstart', unmute);
+        window.removeEventListener('keydown', unmute);
       };
 
-      // Attempt immediately when visible
-      if (document.visibilityState === 'visible') tryPlay();
-      document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') tryPlay(); });
-
-      // Start on first interaction
-      const kick = ()=>tryPlay();
-      window.addEventListener('pointerdown', kick, { once:true });
-      window.addEventListener('touchstart', kick, { once:true });
-      window.addEventListener('keydown', kick, { once:true });
-
-      // Manual button to start if still blocked
-      btn.addEventListener('click', tryPlay);
-
-      // Failsafe: if not started in 4s, show button
-      setTimeout(()=>{ if(!started) btn.style.display='inline-flex'; }, 4000);
+      // Show the button immediately so users know they can enable sound
+      btn.style.display = 'inline-flex';
+      window.addEventListener('pointerdown', unmute, { once:true });
+      window.addEventListener('touchstart', unmute, { once:true });
+      window.addEventListener('keydown', unmute, { once:true });
+      btn.addEventListener('click', unmute, { once:true });
     })();
   </script>
   <!-- Background music (no controls) -->
-  <audio id="bgm" loop preload="auto" playsinline>
-    <source src="audio/surpass%20your%20limits%21.mp3" type="audio/mpeg">
+  <audio id="bgm" loop autoplay muted preload="auto" playsinline style="display:none">
+    <source src="/audio/surpass%20your%20limits%21.mp3" type="audio/mpeg">
   </audio>
-  <button id="sound-on" style="position:fixed;right:14px;bottom:14px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);color:#e6eefc;font-weight:600;letter-spacing:.01em;display:none;z-index:10">🔈 Sound On</button>
+  <button id="sound-on" style="position:fixed;right:14px;bottom:14px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);color:#e6eefc;font-weight:600;letter-spacing:.01em;z-index:10">🔈 Sound On</button>
 </body>
 </html>
