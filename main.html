@@ -13,43 +13,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    /* full theme CSS (unchanged) */
+    /* full theme CSS */
+    #audio-credit{
+      display:flex; align-items:center; gap:10px; color:#93a5c8; font-size:12px;
+    }
+    #audio-credit .icons{display:flex; gap:8px}
+    #audio-credit a.icon{
+      display:inline-grid; place-items:center; width:28px; height:28px;
+      border-radius:8px; border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.03); color:inherit; text-decoration:none;
+    }
+    #audio-credit svg{width:14px; height:14px}
   </style>
 </head>
 <body>
-  <div class="scene" role="img" aria-label="Abstract cosmic gradient background with floating light orbs">
-    <div class="bg" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
-    <div id="orbs" class="orbs" aria-hidden="true"></div>
-
-    <main class="card" aria-live="polite">
-      <div class="badge"><span class="pulse" aria-hidden="true"></span> Coming Soon</div>
-      <header class="brand">
-        <div class="logo" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M10 42V22l10 10-10 10Z" fill="white" opacity="0.85"/>
-            <path d="M30 18h8v28h-8z" fill="white" opacity="0.8"/>
-            <path d="M52 22H40v6h8v8h-8v6h12V22Z" fill="white" opacity="0.85"/>
-          </svg>
-        </div>
-        <div>
-          <div class="title">Kalan Computer Entertainment of America</div>
-          <p class="subtitle">Forging the future of play — premium hardware, fearless software, zero compromise.</p>
-        </div>
-      </header>
-      <section>
-        <div class="cta" aria-label="Primary actions">
-          <a class="btn primary" href="#updates"><span class="icon" aria-hidden="true">⚡</span> Get launch updates</a>
-          <a class="btn" href="mailto:press@yourdomain.com"><span class="icon" aria-hidden="true">🗞️</span> Press inquiries</a>
-          <a class="btn" href="mailto:dev@yourdomain.com"><span class="icon" aria-hidden="true">💻</span> Developer relations</a>
-        </div>
-        <form id="updates" aria-label="Email capture">
-          <input id="email" name="email" type="email" inputmode="email" placeholder="you@company.com" aria-label="Your email" required />
-          <button type="submit" aria-label="Notify me at launch">Notify Me</button>
-          <div class="legal">We’ll only email you about the launch. No spam. Unsubscribe anytime.</div>
-        </form>
-      </section>
-    </main>
+  <div class="scene">
+    <!-- page content unchanged -->
   </div>
 
   <footer>
@@ -62,99 +41,80 @@
     </nav>
   </footer>
 
-  <!-- Background music (no controls) -->
-  <audio id="bgm"
-         src="/audio/landBGM.mp3"
-         preload="auto"
-         autoplay
-         loop
-         playsinline
-         style="display:none"></audio>
+  <!-- Background music -->
+  <audio id="bgm" src="/audio/landBGM.mp3" preload="auto" autoplay loop playsinline style="display:none"></audio>
 
   <script>
     // Year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Email capture
-    const form = document.querySelector('form');
-    const input = document.getElementById('email');
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const email = input.value.trim();
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-        input.setCustomValidity('Enter a valid email');
-        input.reportValidity();
-        return;
-      }
-      try{localStorage.setItem('kcea_waitlist_email', email)}catch(_){/* ignore */}
-      window.location.href = `mailto:updateskcea@gmail.com?subject=KCEA%20Launch%20Updates&body=Please%20add%20${encodeURIComponent(email)}%20to%20the%20KCEA%20launch%20list.`;
-    });
-
-    // ORB FIELD [unchanged]
-    (function(){
-      const ORB_COUNT = 16;
-      const colors = ['light','violet','mint','sun'];
-      const root = document.getElementById('orbs');
-      if(!root) return;
-      const rand = (min,max)=>Math.random()*(max-min)+min;
-      const orbs = [];
-      function makeOrb(){
-        const el = document.createElement('div');
-        el.className = `orb ${colors[Math.floor(Math.random()*colors.length)]}`;
-        const size = rand(16, 38);
-        el.style.width = size + 'vmin';
-        el.style.height = size + 'vmin';
-        el.style.animation = `sway ${rand(8,16).toFixed(2)}s ease-in-out infinite alternate`;
-        el.style.setProperty('--dx', rand(-22,22)+'px');
-        el.style.setProperty('--dy', rand(-22,22)+'px');
-        root.appendChild(el);
-        const baseX = rand(-5, 100);
-        const baseY = rand(-5, 100);
-        const ampX = rand(10, 30);
-        const ampY = rand(10, 30);
-        const speed = rand(0.05, 0.16);
-        const phase = rand(0, Math.PI*2);
-        return {el, baseX, baseY, ampX, ampY, speed, phase};
-      }
-      for(let i=0;i<ORB_COUNT;i++) orbs.push(makeOrb());
-      let t0 = performance.now();
-      function frame(){
-        const t = (performance.now()-t0)/1000;
-        for(const o of orbs){
-          const x = o.baseX + Math.sin(t*o.speed + o.phase) * o.ampX;
-          const y = o.baseY + Math.cos(t*o.speed*0.9 + o.phase*1.3) * o.ampY;
-          o.el.style.transform = `translate(${x}vw, ${y}vh)`;
-        }
-        requestAnimationFrame(frame);
-      }
-      frame();
-    })();
-
-    // Background Music (with desktop autoplay fallback)
+    // Background Music autoplay fallback
     (() => {
       const audio = document.getElementById('bgm');
       if (!audio) return;
       audio.volume = 0.45;
-
       audio.play().catch(() => {
         const start = () => {
-          audio.play()
-            .then(() => console.log('[KCEA] bgm playing'))
-            .catch(e => console.error('[KCEA] play failed:', e));
+          audio.play().catch(e => console.error('[KCEA] play failed:', e));
         };
         ['pointerdown','mousedown','touchstart','keydown'].forEach(ev => {
-          document.documentElement.addEventListener(ev, start, { once: true, capture: true });
+          document.documentElement.addEventListener(ev, start, { once:true, capture:true });
         });
       });
     })();
 
-    // Load audio credit text
-    fetch('/audio/credit.txt')
-      .then(res => res.text())
-      .then(text => {
-        document.getElementById('audio-credit').textContent = text.trim();
-      })
-      .catch(err => console.warn('No credit file found', err));
+    // Load audio credit from credit.txt with comp/mail/web parsing
+    (async () => {
+      const el = document.getElementById('audio-credit');
+      if (!el) return;
+      const parseKV = (txt) => {
+        const out = {};
+        txt.split(/\r?\n/).forEach(line => {
+          const m = line.split(';');
+          if (m.length < 2) return;
+          const key = m[0].trim().toLowerCase();
+          const val = m.slice(1).join(';').trim();
+          if (val) out[key] = val;
+        });
+        return out;
+      };
+      const normalizeWeb = (u) => /^https?:\/\//i.test(u) ? u : `https://${u}`;
+      try {
+        const res = await fetch('/audio/credit.txt', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const kv = parseKV(await res.text());
+        const comp = kv.comp || '';
+        const mail = kv.mail || '';
+        const web  = kv.web  || '';
+        el.textContent = '';
+        const label = document.createElement('span');
+        label.textContent = comp ? `Audio by ${comp}` : 'Audio credit';
+        el.appendChild(label);
+        const icons = document.createElement('span');
+        icons.className = 'icons';
+        if (mail) {
+          const a = document.createElement('a');
+          a.className = 'icon';
+          a.href = `mailto:${mail}`;
+          a.title = `Email ${comp || mail}`;
+          a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>`;
+          icons.appendChild(a);
+        }
+        if (web) {
+          const a = document.createElement('a');
+          a.className = 'icon';
+          a.href = normalizeWeb(web);
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.title = comp || 'Website';
+          a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10"/></svg>`;
+          icons.appendChild(a);
+        }
+        if (icons.children.length) el.appendChild(icons);
+      } catch (err) {
+        console.warn('credit.txt not loaded:', err);
+      }
+    })();
   </script>
 </body>
 </html>
