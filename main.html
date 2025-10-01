@@ -73,6 +73,10 @@
     .cta{display:flex; gap:12px; flex-wrap:wrap; margin:24px 0 4px}
     .btn{--pad:14px; display:inline-flex; align-items:center; gap:.6ch; padding:var(--pad) clamp(16px, 2.2vw, 22px); border-radius:14px; border:1px solid rgba(255,255,255,.16); text-decoration:none; font-weight:600; letter-spacing:.01em; transition:transform .15s ease, border-color .2s ease, background .2s ease;}
     .btn.primary{background:linear-gradient(90deg, rgba(108,240,255,.25), rgba(165,123,255,.25));}
+    .btn.disabled{opacity:.55; cursor:not-allowed; pointer-events:none;} 
+    .btn:hover{transform:translateY(-1px); border-color:rgba(255,255,255,.35)}
+    .btn .icon{display:inline-grid; place-items:center; width:1.1em; height:1.1em}
+    .btn.primary{background:linear-gradient(90deg, rgba(108,240,255,.25), rgba(165,123,255,.25));}
     .btn:hover{transform:translateY(-1px); border-color:rgba(255,255,255,.35)}
     .btn .icon{display:inline-grid; place-items:center; width:1.1em; height:1.1em}
 
@@ -121,9 +125,21 @@
 
       <section>
         <div class="cta" aria-label="Primary actions">
-          <a class="btn primary" href="#updates"><span class="icon" aria-hidden="true">⚡</span> Get launch updates</a>
-          <a class="btn" href="mailto:press@yourdomain.com"><span class="icon" aria-hidden="true">🗞️</span> Press inquiries</a>
-          <a class="btn" href="mailto:dev@yourdomain.com"><span class="icon" aria-hidden="true">💻</span> Developer relations</a>
+          <!-- Single Projects button -->
+          <a id="projects-btn" class="btn primary" href="#" role="button">
+  <span class="icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" 
+         stroke="currentColor" stroke-width="2" 
+         stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="4"/>
+      <rect x="14" y="3" width="7" height="4"/>
+      <rect x="9" y="9" width="7" height="4"/>
+      <rect x="3" y="15" width="7" height="4"/>
+      <rect x="14" y="15" width="7" height="4"/>
+    </svg>
+  </span>
+  Projects
+</a>
         </div>
 
         <form id="updates" aria-label="Email capture">
@@ -286,6 +302,23 @@
       } catch (err) {
         console.warn('credit.txt not loaded:', err);
       }
+    })();
+  
+    // Optional: future auto-link for Projects from a tiny config file
+    (async () => {
+      const btn = document.getElementById('projects-btn');
+      if (!btn) return;
+      try {
+        // When you're ready, create /data/projects_link.txt containing a full URL or relative path
+        const res = await fetch('/data/projects_link.txt', { cache: 'no-store' });
+        if (!res.ok) return; // leave disabled if file missing
+        const url = (await res.text()).trim();
+        if (!url) return;
+        btn.href = url.startsWith('http') ? url : url; // accept absolute or relative
+        btn.removeAttribute('aria-disabled');
+        btn.classList.remove('disabled');
+        // If you want new tab behavior later: btn.target = '_blank'; btn.rel = 'noopener';
+      } catch (_) { /* keep disabled */ }
     })();
   </script>
 </body>
