@@ -242,22 +242,46 @@
       frame();
     })();
 
-    // --- BACKGROUND MUSIC: attempt autoplay, fall back to first click ---
+    // --- BACKGROUND MUSIC: robust start logic ---
     (function(){
       const audio = document.getElementById('bgm');
+      const btn = document.getElementById('sound-on');
       if(!audio) return;
-      audio.volume = 0.35; // background level
-      const tryPlay = () => audio.play().catch(()=>{});
-      // Try as soon as possible
+      audio.volume = 0.45; // background level
+
+      let started = false;
+      const tryPlay = () => {
+        if (started) return;
+        audio.play().then(()=>{
+          started = true;
+          btn.style.display = 'none';
+        }).catch(()=>{
+          // if blocked, show the manual button
+          btn.style.display = 'inline-flex';
+        });
+      };
+
+      // Attempt immediately when visible
       if (document.visibilityState === 'visible') tryPlay();
       document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') tryPlay(); });
-      // Guaranteed fallback: first user interaction
-      window.addEventListener('pointerdown', tryPlay, { once:true });
+
+      // Start on first interaction
+      const kick = ()=>tryPlay();
+      window.addEventListener('pointerdown', kick, { once:true });
+      window.addEventListener('touchstart', kick, { once:true });
+      window.addEventListener('keydown', kick, { once:true });
+
+      // Manual button to start if still blocked
+      btn.addEventListener('click', tryPlay);
+
+      // Failsafe: if not started in 4s, show button
+      setTimeout(()=>{ if(!started) btn.style.display='inline-flex'; }, 4000);
     })();
   </script>
   <!-- Background music (no controls) -->
-  <audio id="bgm" loop preload="auto" style="display:none">
-    <source src="audio/surpass%20your%20limits!.mp3" type="audio/mpeg">
+  <audio id="bgm" loop preload="auto" playsinline>
+    <source src="audio/surpass%20your%20limits%21.mp3" type="audio/mpeg">
   </audio>
+  <button id="sound-on" style="position:fixed;right:14px;bottom:14px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);color:#e6eefc;font-weight:600;letter-spacing:.01em;display:none;z-index:10">🔈 Sound On</button>
 </body>
 </html>
