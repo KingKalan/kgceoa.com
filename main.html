@@ -62,7 +62,13 @@
   </footer>
 
   <!-- Background music (no controls) -->
-  <audio id="bgm" src="audio/landBGM.mp3" preload="auto" autoplay loop playsinline style="display:none"></audio>
+  <audio id="bgm"
+         src="/audio/landBGM.mp3"
+         preload="auto"
+         autoplay
+         loop
+         playsinline
+         style="display:none"></audio>
 
   <script>
     // Year
@@ -123,17 +129,23 @@
       frame();
     })();
 
-    // Background Music attempt
-    document.addEventListener('DOMContentLoaded', () => {
+    // Background Music (with desktop autoplay fallback)
+    (() => {
       const audio = document.getElementById('bgm');
-      if(!audio) return;
-      audio.volume = 0.35;
-      audio.play().catch(err => {
-        console.warn('Autoplay blocked, waiting for first user interaction:', err);
-        const retry = () => { audio.play().catch(()=>{}); window.removeEventListener('pointerdown', retry, true); };
-        window.addEventListener('pointerdown', retry, { once:true, capture:true });
+      if (!audio) return;
+      audio.volume = 0.45;
+
+      audio.play().catch(() => {
+        const start = () => {
+          audio.play()
+            .then(() => console.log('[KCEA] bgm playing'))
+            .catch(e => console.error('[KCEA] play failed:', e));
+        };
+        ['pointerdown','mousedown','touchstart','keydown'].forEach(ev => {
+          document.documentElement.addEventListener(ev, start, { once: true, capture: true });
+        });
       });
-    });
+    })();
   </script>
 </body>
 </html>
