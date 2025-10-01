@@ -242,42 +242,61 @@
       frame();
     })();
 
-    // --- BACKGROUND MUSIC: robust start logic with muted autoplay then unmute ---
+    // --- BACKGROUND MUSIC: robust start logic using Web Audio on first gesture ---
     (function(){
       const audio = document.getElementById('bgm');
       const btn = document.getElementById('sound-on');
+      const status = document.getElementById('sound-status');
       if(!audio) return;
 
-      // Start silently (autoplay allowed), then unmute on first gesture
-      audio.volume = 0.0; // start silent
-      const ensurePlaying = () => audio.play().catch(()=>{});
-      // try immediately
-      if (document.visibilityState === 'visible') ensurePlaying();
-      document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') ensurePlaying(); });
+      let ctx, node, started=false;
+      function log(msg){ status.textContent = msg; setTimeout(()=>{ status.textContent=''; }, 3000); }
 
-      const unmute = () => {
-        audio.muted = false;
-        audio.volume = 0.45;
-        ensurePlaying();
-        btn.style.display = 'none';
-        // remove listeners after first success
-        window.removeEventListener('pointerdown', unmute);
-        window.removeEventListener('touchstart', unmute);
-        window.removeEventListener('keydown', unmute);
-      };
+      function setup(){
+        try{
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if(!AC) return false;
+          ctx = new AC();
+          node = ctx.createMediaElementSource(audio);
+          node.connect(ctx.destination);
+          return true;
+        }catch(e){ return false; }
+      }
 
-      // Show the button immediately so users know they can enable sound
+      function enableSound(){
+        // Initialize audio graph if possible
+        setup();
+        const resume = ctx && ctx.state !== 'running' ? ctx.resume() : Promise.resolve();
+        Promise.resolve(resume).then(()=>{
+          audio.muted = false;
+          audio.volume = 0.5;
+          return audio.play();
+        }).then(()=>{
+          started = true;
+          btn.style.display = 'none';
+          log('Audio playing');
+        }).catch((err)=>{
+          console.warn('Audio play failed', err);
+          btn.style.display = 'inline-flex';
+          log('Tap again to enable sound');
+        });
+      }
+
+      // Show button by default so the user can always enable
       btn.style.display = 'inline-flex';
-      window.addEventListener('pointerdown', unmute, { once:true });
-      window.addEventListener('touchstart', unmute, { once:true });
-      window.addEventListener('keydown', unmute, { once:true });
-      btn.addEventListener('click', unmute, { once:true });
+      btn.addEventListener('click', enableSound, { once:false });
+      window.addEventListener('pointerdown', ()=>{ if(!started) enableSound(); }, { once:true });
+      window.addEventListener('keydown', ()=>{ if(!started) enableSound(); }, { once:true });
+
+      // Preload silently so it loops seamlessly on start
+      audio.load();
     })();
   </script>
   <!-- Background music (no controls) -->
-  <audio id="bgm" loop autoplay muted preload="auto" playsinline style="display:none">
+  <audio id="bgm" loop muted preload="auto" playsinline style="display:none">
     <source src="/audio/surpass%20your%20limits%21.mp3" type="audio/mpeg">
   </audio>
-  <button id="sound-on" style="position:fixed;right:14px;bottom:14px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);color:#e6eefc;font-weight:600;letter-spacing:.01em;z-index:10">🔈 Sound On</button>
+  <button id="sound-on" style="position:fixed;right:14px;bottom:72px;padding:8px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);color:#e6eefc;font-weight:600;letter-spacing:.01em;z-index:10">🔈 Sound On</button>
+  <div id="sound-status" style="position:fixed;right:14px;bottom:48px;font-size:12px;color:#b9c8ea;opacity:.9;z-index:9;pointer-events:none"></div>
 </body>
 </html>
