@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KCEA — Developer Pathways</title>
+  <meta name="description" content="Choose your pathway to develop for the KGx Numen — Homebrew or Licensed Developer."/>
+  <meta name="theme-color" content="#0b0f1a"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f1a; --panel:#0f1524; --panel-2:#111a2b; --ink:#e7ecf7; --muted:#9fb2d9; --accent:#5fd4ff; --accent-2:#8a7dff; --radius:22px;
+      --shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 0 rgba(255,255,255,.025) inset;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; background:radial-gradient(1100px 520px at 85% -10%, rgba(138,125,255,.12), transparent 60%), radial-gradient(900px 420px at 15% 110%, rgba(95,212,255,.08), transparent 60%), var(--bg); color:var(--ink); font-family:Inter,system-ui,sans-serif}
+    .wrap{max-width:900px; margin-inline:auto; padding:24px clamp(16px,3.5vw,48px) 56px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .brand{display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--ink)}
+    .brand-logo{width:38px; aspect-ratio:1; border-radius:12px; display:grid; place-items:center; background:linear-gradient(145deg,var(--accent),var(--accent-2))}
+    .brand-title{font-family:Unbounded,Inter,sans-serif; font-weight:800; font-size:clamp(16px,2.2vw,22px)}
+    nav a{color:var(--muted); text-decoration:none; font-weight:600; margin-left:18px}
+    nav a:hover{color:var(--ink)}
+
+    .breadcrumbs{margin:18px 0 0; font-size:12px; color:var(--muted)}
+    .breadcrumbs a{color:var(--muted); text-decoration:none}
+    .breadcrumbs a:hover{color:var(--ink)}
+
+    .hero{margin:28px 0 18px; text-align:center}
+    .hero h1{font-family:Unbounded,sans-serif; font-weight:800; font-size:clamp(30px,5vw,54px); margin:0 0 12px}
+    .hero p{color:var(--muted); font-size:clamp(15px,2vw,18px); max-width:70ch; margin-inline:auto}
+    .hero .note{margin-top:14px; font-size:clamp(13px,1.6vw,16px); color:var(--muted)}
+
+    .cards{display:grid; gap:24px; margin-top:32px}
+    @media (min-width:700px){.cards{grid-template-columns:1fr 1fr}}
+
+    .card{background:linear-gradient(180deg,var(--panel),var(--panel-2)); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); text-align:left; display:flex; flex-direction:column; justify-content:space-between}
+    .card h2{font-family:Unbounded,sans-serif; font-size:20px; margin-top:0}
+    .card p{flex-grow:1; line-height:1.6; margin-bottom:18px}
+    .card a{display:inline-block; margin-top:auto; font-weight:700; color:var(--accent); text-decoration:none}
+    .card a:hover{color:var(--ink)}
+
+    footer{margin-top:40px; color:var(--muted); font-size:12px; text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="/">
+        <div class="brand-logo"></div>
+        <span class="brand-title">Kalan Computer Entertainment of America</span>
+      </a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/projects/hardware.html">Hardware</a>
+        <a href="#" aria-current="page">Developer Pathways</a>
+      </nav>
+    </header>
+
+    <div class="breadcrumbs">
+      <a href="/projects.html">Projects</a> / <span>Developer Pathways</span>
+    </div>
+
+    <section class="hero">
+      <h1>Developer Pathways</h1>
+      <p>Two distinct routes to create on the KGx Numen platform — from indie homebrew to officially licensed titles.</p>
+      <p class="note">Both pathways honor openness and creativity while safeguarding quality standards, ensuring every release on the Numen is complete, original, and true to the legacy of the platform.</p>
+    </section>
+
+    <div class="cards">
+      <div class="card">
+        <h2>Homebrew Pathway</h2>
+        <p>Elevate privileges on your system to flash deployable ROMs directly to cartridges, enabling development and testing on real Numen hardware. Intended as a lower‑tier developer pathway for hobbyists and indie creators.</p>
+        <a href="/pathways/HBapp.html">Learn More →</a>
+      </div>
+      <div class="card">
+        <h2>Licensed Developer</h2>
+        <p>The official pathway for studios seeking to develop and deploy licensed titles at scale. Supports the full pipeline for bringing complete, polished games to market on the Numen system.</p>
+        <a href="/pathways/DEVapp.html">Learn More →</a>
+      </div>
+    </div>
+
+    <footer>
+      © <span id="y"></span> Kalan Computer Entertainment of America. All rights reserved.
+    </footer>
+  </div>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
