@@ -1,58 +1,143 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Page Not Found — KCEA</title>
-  <meta name="description" content="This page is under construction or does not exist yet."/>
+  <title>KCEA — Developer Application</title>
+  <meta name="description" content="Apply to develop on the KGx Numen platform."/>
   <meta name="theme-color" content="#0b0f1a"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:100vh;
-      background:#0b0f1a;
-      color:#e7ecf7;
-      font-family: Inter, system-ui, sans-serif;
-      text-align:center;
+    :root{
+      --bg:#0b0f1a; --panel:#0f1524; --panel-2:#111a2b; --ink:#e7ecf7; --muted:#9fb2d9; --accent:#5fd4ff; --accent-2:#8a7dff; --radius:22px; --shadow:0 10px 24px rgba(0,0,0,.35),0 2px 0 rgba(255,255,255,.025) inset;
     }
-    .box {
-      max-width:600px;
-      padding:32px;
-      border-radius:20px;
-      background:linear-gradient(180deg,#0f1524,#111a2b);
-      box-shadow:0 10px 24px rgba(0,0,0,.35);
-    }
-    h1 {
-      font-size:clamp(28px,5vw,52px);
-      margin:0 0 16px;
-      font-family: Unbounded, sans-serif;
-    }
-    p {
-      color:#9fb2d9;
-      margin:0 0 24px;
-    }
-    a {
-      display:inline-block;
-      margin-top:12px;
-      padding:12px 20px;
-      border-radius:14px;
-      font-weight:700;
-      text-decoration:none;
-      color:#0b0f1a;
-      background:linear-gradient(90deg,#5fd4ff,#8a7dff);
-    }
-    a:hover { transform:translateY(-1px); }
+    *{box-sizing:border-box}
+    body{margin:0; color:var(--ink); font-family:Inter,system-ui,sans-serif; background:#fff}
+
+    /* ORB BANNER (top only) */
+    .banner{position:relative; overflow:hidden; background:var(--bg)}
+    .banner-inner{max-width:900px; margin-inline:auto; padding:24px clamp(16px,3.5vw,48px) 40px; position:relative; z-index:1}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .brand{display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--ink)}
+    .brand-logo{width:38px; aspect-ratio:1; border-radius:12px; display:grid; place-items:center; background:linear-gradient(145deg,var(--accent),var(--accent-2))}
+    .brand-title{font-family:Unbounded,Inter,sans-serif; font-weight:800; font-size:clamp(16px,2.2vw,22px)}
+    nav a{color:var(--muted); text-decoration:none; font-weight:600; margin-left:18px}
+    nav a:hover{color:var(--ink)}
+
+    .breadcrumbs{margin:18px 0 0; font-size:12px; color:var(--muted)}
+    .breadcrumbs a{color:var(--muted); text-decoration:none}
+    .breadcrumbs a:hover{color:var(--ink)}
+
+    .hero{margin:24px 0 4px; text-align:center}
+    .hero h1{font-family:Unbounded,sans-serif; font-weight:800; font-size:clamp(30px,5vw,54px); margin:0 0 8px}
+    .hero p{color:var(--muted); font-size:clamp(15px,2vw,18px); max-width:70ch; margin-inline:auto}
+
+    /* orbs inside banner only */
+    .orbs{position:absolute; inset:-12vmax; z-index:0; pointer-events:none}
+    .orb{position:absolute; border-radius:50%; opacity:.418; filter:blur(32px); mix-blend-mode:screen; will-change:transform}
+    .orb.light{background:radial-gradient(circle at 35% 35%, rgba(108,240,255,.77), transparent 60%)}
+    .orb.violet{background:radial-gradient(circle at 65% 65%, rgba(165,123,255,.77), transparent 60%)}
+    .orb.mint{background:radial-gradient(circle at 50% 50%, rgba(64,255,176,.605), transparent 60%)}
+    .orb.sun{background:radial-gradient(circle at 40% 40%, rgba(255,200,80,.495), transparent 60%)}
+    @keyframes sway{50%{transform:translate3d(var(--dx),var(--dy),0) scale(1.05)} 100%{transform:translate3d(0,0,0) scale(1)}}
+
+    /* WHITE DOCUMENT AREA */
+    .doc{background:#fff; color:#111}
+    .doc-inner{max-width:980px; margin-inline:auto; padding:24px clamp(12px,3vw,24px) 56px}
+    .doc .toolbar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px}
+    .doc .toolbar .download{display:inline-block; padding:10px 14px; border-radius:12px; font-weight:800; text-decoration:none; color:#0b0f1a; background:linear-gradient(90deg, var(--accent), var(--accent-2)); border:1px solid rgba(0,0,0,.06)}
+    .doc .toolbar .back{color:#444; text-decoration:none; border:1px solid #e5e7eb; border-radius:12px; padding:10px 14px; font-weight:700}
+    .doc .viewer{background:#fff; border:1px solid #e5e7eb; border-radius:14px; overflow:hidden; min-height:80vh}
+    .doc .viewer iframe, .doc .viewer object{width:100%; height:80vh; display:block; background:#fff}
+    .doc .note{font-size:13px; color:#555; margin-top:8px}
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>🚧 Page Under Construction</h1>
-    <p>This page is not ready yet or may not exist.<br/>Please check back soon.</p>
-    <a href="javascript:history.back()">← Back</a>
-  </div>
+  <section class="banner" aria-label="KCEA header">
+    <div class="orbs" aria-hidden="true" id="orbs"></div>
+    <div class="banner-inner">
+      <header>
+        <a class="brand" href="/">
+          <div class="brand-logo"></div>
+          <span class="brand-title">Kalan Computer Entertainment of America</span>
+        </a>
+        <nav>
+          <a href="/">Home</a>
+          <a href="/projects.html">Projects</a>
+          <a href="/pathways/devpath.html">Developer Pathways</a>
+          <a href="#" aria-current="page">Apply</a>
+        </nav>
+      </header>
+
+      <div class="breadcrumbs">
+        <a href="/projects.html">Projects</a> / <a href="/pathways/devpath.html">Developer Pathways</a> / <span>Apply</span>
+      </div>
+
+      <section class="hero">
+        <h1>Developer Application</h1>
+        <p>Download and print the application, then submit via the instructions in the document.</p>
+      </section>
+    </div>
+  </section>
+
+  <section class="doc" aria-label="Application document">
+    <div class="doc-inner">
+      <div class="toolbar">
+        <a class="back" href="javascript:history.back()">← Back</a>
+        <a class="download" href="/docs/KCEA-Developer-Application.pdf" download>Download Application (PDF)</a>
+      </div>
+
+      <div class="viewer">
+        <!-- Embed the printable PDF below -->
+        <object data="/docs/KCEA-Developer-Application.pdf#view=FitH" type="application/pdf">
+          <iframe src="/docs/KCEA-Developer-Application.pdf#view=FitH"></iframe>
+        </object>
+      </div>
+      <p class="note">If the PDF does not load, <a href="/docs/KCEA-Developer-Application.pdf" download>click here to download it</a>.</p>
+    </div>
+  </section>
+
+  <script>
+    // ORB FIELD in banner only
+    (function(){
+      const ORB_COUNT = 16;
+      const colors = ['light','violet','mint','sun'];
+      const root = document.getElementById('orbs');
+      const rand = (min,max)=>Math.random()*(max-min)+min;
+      const orbs = [];
+      function makeOrb(){
+        const el = document.createElement('div');
+        el.className = `orb ${colors[Math.floor(Math.random()*colors.length)]}`;
+        const size = rand(16, 38);
+        el.style.width = size + 'vmin';
+        el.style.height = size + 'vmin';
+        el.style.animation = `sway ${rand(8,16).toFixed(2)}s ease-in-out infinite alternate`;
+        el.style.setProperty('--dx', rand(-22,22)+'px');
+        el.style.setProperty('--dy', rand(-22,22)+'px');
+        root.appendChild(el);
+        const baseX = rand(-5, 100);
+        const baseY = rand(-5, 100);
+        const ampX = rand(10, 30);
+        const ampY = rand(10, 30);
+        const speed = rand(0.05, 0.16);
+        const phase = rand(0, Math.PI*2);
+        return {el, baseX, baseY, ampX, ampY, speed, phase};
+      }
+      for(let i=0;i<ORB_COUNT;i++) orbs.push(makeOrb());
+      let t0 = performance.now();
+      function frame(){
+        const t = (performance.now()-t0)/1000;
+        for(const o of orbs){
+          const x = o.baseX + Math.sin(t*o.speed + o.phase) * o.ampX;
+          const y = o.baseY + Math.cos(t*o.speed*0.9 + o.phase*1.3) * o.ampY;
+          o.el.style.transform = `translate(${x}vw, ${y}vh)`;
+        }
+        requestAnimationFrame(frame);
+      }
+      frame();
+    })();
+  </script>
 </body>
 </html>
