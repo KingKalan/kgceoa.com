@@ -11,70 +11,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0b0f1a;      /* page background */
-      --panel:#0f1524;   /* card surface */
-      --panel-2:#111a2b; /* hover surface */
-      --ink:#e7ecf7;     /* primary text */
-      --muted:#9fb2d9;   /* secondary text */
-      --accent:#5fd4ff;  /* accent/cyan */
-      --accent-2:#8a7dff;/* accent/purple */
-      --ring:rgba(95,212,255,.35);
+      --bg:#0b0f1a;
+      --panel:#0f1524;
+      --panel-2:#111a2b;
+      --ink:#e7ecf7;
+      --muted:#9fb2d9;
+      --accent:#5fd4ff;
+      --accent-2:#8a7dff;
       --radius:22px;
       --shadow: 0 10px 24px rgba(0,0,0,.35), 0 2px 0 rgba(255,255,255,.025) inset;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
-      margin:0; background:radial-gradient(1200px 600px at 80% -10%, rgba(138,125,255,.15), transparent 60%), radial-gradient(1000px 500px at 20% 110%, rgba(95,212,255,.10), transparent 60%), var(--bg);
-      color:var(--ink); font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; letter-spacing:.2px;
+      margin:0; background:var(--bg); color:var(--ink); font-family:Inter,system-ui,sans-serif;
     }
     .wrap{max-width:1100px; margin-inline:auto; padding:24px clamp(16px,3.5vw,48px) 56px}
-    header{
-      display:flex; align-items:center; justify-content:space-between; gap:16px; padding:10px 0 8px;
-    }
+    header{display:flex; justify-content:space-between; align-items:center;}
     .brand{display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--ink)}
-    .brand-logo{
-      width:38px; aspect-ratio:1; border-radius:12px; display:grid; place-items:center; background:linear-gradient(145deg,var(--accent),var(--accent-2)); box-shadow:0 8px 24px rgba(95,212,255,.25);
-    }
-    .brand-title{font-family:Unbounded,Inter,sans-serif; font-weight:800; font-size:clamp(16px,2.2vw,22px); letter-spacing:.5px}
+    .brand-logo{width:38px; aspect-ratio:1; border-radius:12px; display:grid; place-items:center; background:linear-gradient(145deg,var(--accent),var(--accent-2));}
+    .brand-title{font-family:Unbounded,sans-serif; font-weight:800; font-size:clamp(16px,2.2vw,22px)}
     nav a{color:var(--muted); text-decoration:none; font-weight:600; margin-left:18px}
     nav a:hover{color:var(--ink)}
-    .hero{margin-top:26px; margin-bottom:12px}
-    .eyebrow{color:var(--muted); text-transform:uppercase; font-weight:800; letter-spacing:.18em; font-size:12px}
-    h1{font-family:Unbounded,Inter,sans-serif; font-weight:800; font-size:clamp(28px,4.6vw,48px); margin:.25em 0 .35em}
-    .lead{color:var(--muted); font-size:clamp(14px,2vw,18px); max-width:70ch; line-height:1.6}
-
-    /* Grid of cards */
-    .grid{display:grid; gap:22px; margin-top:28px; grid-template-columns:repeat(1,minmax(0,1fr))}
-    @media (min-width:560px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (min-width:960px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-
+    .hero{margin:30px 0}
+    h1{font-family:Unbounded,sans-serif; font-weight:800; font-size:clamp(28px,4.6vw,48px);}
+    .lead{color:var(--muted); font-size:clamp(14px,2vw,18px); max-width:70ch;}
+    .grid{display:grid; gap:22px; margin-top:28px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
     .card{
-      position:relative; border-radius:var(--radius); background:linear-gradient(180deg,var(--panel),var(--panel-2));
-      box-shadow:var(--shadow); padding:18px; text-decoration:none; color:inherit; isolation:isolate;
-      display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
-      min-height:220px; /* taller for squarer feel */
-      aspect-ratio: 1/1.05; /* nudges toward square on larger screens */
-      overflow:hidden; border:1px solid rgba(255,255,255,.05);
+      border-radius:var(--radius); background:linear-gradient(180deg,var(--panel),var(--panel-2));
+      box-shadow:var(--shadow); padding:18px; text-decoration:none; color:inherit;
+      display:flex; flex-direction:column; justify-content:flex-end; min-height:220px;
     }
-    .card:focus-visible{outline:3px solid var(--ring); outline-offset:3px}
-    .card:hover{transform:translateY(-2px); transition:transform .18s ease}
-    .card .glow{
-      position:absolute; inset:auto -30% 40% -30%; height:60%; border-radius:50%; filter:blur(40px); opacity:.35; z-index:-1;
-      background:radial-gradient(60% 60% at 50% 50%, var(--accent), transparent 70%);
-    }
-    .card .icon{
-      width:52px; height:52px; border-radius:14px; display:grid; place-items:center; background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(3px); margin-bottom:14px;
-    }
-    .card h2{font-family:Unbounded,Inter,sans-serif; font-size: clamp(18px,2.2vw,22px); margin:.2em 0 .35em}
-    .card p{color:var(--muted); font-size:14px; line-height:1.5; margin:0 0 14px}
-    .card .cta{margin-top:auto; display:inline-flex; align-items:center; gap:10px; font-weight:800; color:var(--ink)}
-    .pill{
-      position:absolute; top:14px; right:14px; font-size:11px; letter-spacing:.12em; font-weight:800; text-transform:uppercase; color:#0b0f1a;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:999px; padding:6px 10px;
-    }
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .card h2{font-family:Unbounded,sans-serif; font-size:22px; margin:.2em 0 .35em}
+    .card p{color:var(--muted); font-size:14px;}
     footer{margin-top:40px; color:var(--muted); font-size:12px}
   </style>
 </head>
@@ -82,12 +50,7 @@
   <div class="wrap">
     <header>
       <a class="brand" href="/">
-        <div class="brand-logo" aria-hidden="true">
-          <!-- Simple spark/chevron mark -->
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 3l3 6H9l3-6Zm0 18l-3-6h6l-3 6Z" fill="white"/>
-          </svg>
-        </div>
+        <div class="brand-logo"></div>
         <span class="brand-title">Kalan Computer Entertainment of America</span>
       </a>
       <nav>
@@ -97,65 +60,30 @@
       </nav>
     </header>
 
-    <section class="hero" aria-labelledby="projects-title">
-      <div class="eyebrow">Explore</div>
-      <h1 id="projects-title">Projects</h1>
-      <p class="lead">Dive into what we're building at KCEA — from silicon and shells to engines, stories, and screens.
-      Choose a track to explore active work, roadmaps, and sneak peeks.</p>
+    <section class="hero">
+      <h1>Projects</h1>
+      <p class="lead">Explore the key creative tracks we’re building at KCEA.</p>
     </section>
 
-    <section class="grid" aria-label="Project categories">
-      <!-- Hardware -->
+    <section class="grid">
       <a class="card" href="/projects/hardware.html">
-        <span class="pill">Core</span>
-        <span class="glow" aria-hidden="true"></span>
-        <div class="icon" aria-hidden="true">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 7h16v10H4V7Zm3-4h10v4H7V3Zm0 18h10v-2H7v2Z" stroke="white" stroke-width="1.5"/>
-          </svg>
-        </div>
         <h2>Hardware</h2>
-        <p>Numen console, controllers, cartridges, and dev hardware. BOMs, schematics, and prototypes.</p>
-        <span class="cta">View hardware →</span>
+        <p>Get a peek at the hardware coming soon.</p>
       </a>
 
-      <!-- Software -->
       <a class="card" href="/projects/software.html">
-        <span class="glow" aria-hidden="true" style="background:radial-gradient(60% 60% at 50% 50%, var(--accent-2), transparent 70%)"></span>
-        <div class="icon" aria-hidden="true">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 18l-4-4 4-4M16 6l4 4-4 4M10 20h4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
         <h2>Software</h2>
-        <p>Numen Studio IDE, SDK, emulators, engines, and tooling that power creation.</p>
-        <span class="cta">View software →</span>
+        <p>Launch title games in development.</p>
       </a>
 
-      <!-- Books -->
       <a class="card" href="/projects/books.html">
-        <span class="glow" aria-hidden="true" style="background:radial-gradient(60% 60% at 50% 50%, #ffd66b, transparent 70%)"></span>
-        <div class="icon" aria-hidden="true">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 5h9a3 3 0 013 3v11H8a3 3 0 00-3 3V5Z" stroke="white" stroke-width="1.5"/>
-          </svg>
-        </div>
         <h2>Books</h2>
-        <p>World bibles, design docs, art books, and written lore from the KCEA universe.</p>
-        <span class="cta">View books →</span>
+        <p>The complete writing of the prologue to <em>In the Hours Between</em>.</p>
       </a>
 
-      <!-- Film/TV -->
       <a class="card" href="/projects/film-tv.html">
-        <span class="glow" aria-hidden="true" style="background:radial-gradient(60% 60% at 50% 50%, #ff6b9d, transparent 70%)"></span>
-        <div class="icon" aria-hidden="true">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 7h12v10H3V7Zm12 4l6-4v10l-6-4Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
-          </svg>
-        </div>
         <h2>Film / TV</h2>
-        <p>Adaptations and original productions—trailers, teasers, and behind‑the‑scenes.</p>
-        <span class="cta">View film & TV →</span>
+        <p>Screenplay adaptation of <em>In the Hours Between</em>.</p>
       </a>
     </section>
 
@@ -163,9 +91,7 @@
       © <span id="y"></span> Kalan Computer Entertainment of America. All rights reserved.
     </footer>
   </div>
-
   <script>
-    // year stamp
     document.getElementById('y').textContent = new Date().getFullYear();
   </script>
 </body>
