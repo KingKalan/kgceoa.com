@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KCEA — About</title>
+  <meta name="description" content="About Kalan Computer Entertainment of America — mission, values, and commitment to physical media and creators."/>
+  <meta name="theme-color" content="#0b0f1a"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f1a; --panel:#0f1524; --panel-2:#111a2b; --ink:#e7ecf7; --muted:#9fb2d9; --accent:#5fd4ff; --accent-2:#8a7dff; --radius:22px;
+      --shadow:0 10px 24px rgba(0,0,0,.35),0 2px 0 rgba(255,255,255,.025) inset;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(138,125,255,.25), transparent 60%),
+        radial-gradient(1000px 500px at 20% 110%, rgba(95,212,255,.20), transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      font-family:Inter,system-ui,sans-serif;
+    }
+    .wrap{max-width:960px; margin-inline:auto; padding:24px clamp(16px,3.5vw,48px) 56px; position:relative; z-index:1}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .brand{display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--ink)}
+    .brand-logo{width:38px; aspect-ratio:1; border-radius:12px; display:grid; place-items:center; background:linear-gradient(145deg,var(--accent),var(--accent-2))}
+    .brand-title{font-family:Unbounded,Inter,sans-serif; font-weight:800; font-size:clamp(16px,2.2vw,22px)}
+    nav a{color:var(--muted); text-decoration:none; font-weight:600; margin-left:18px}
+    nav a:hover{color:var(--ink)}
+
+    .breadcrumbs{margin:18px 0 0; font-size:12px; color:var(--muted)}
+    .breadcrumbs a{color:var(--muted); text-decoration:none}
+    .breadcrumbs a:hover{color:var(--ink)}
+
+    .hero{margin:28px 0 18px; text-align:center}
+    .hero h1{font-family:Unbounded,sans-serif; font-weight:800; font-size:clamp(30px,5vw,54px); margin:0 0 12px}
+    .hero p{color:var(--muted); font-size:clamp(15px,2vw,18px); max-width:72ch; margin-inline:auto}
+
+    .grid{display:grid; gap:22px; margin-top:24px}
+    @media (min-width:900px){.grid{grid-template-columns:1fr 1fr}}
+
+    .box{background:linear-gradient(180deg,var(--panel),var(--panel-2)); border-radius:22px; padding:26px; box-shadow:var(--shadow)}
+    .box h2{font-family:Unbounded,sans-serif; font-size:22px; margin:0 0 8px}
+    .box p{line-height:1.65; color:var(--ink)}
+    .muted{color:var(--muted)}
+
+    .cta-row{margin-top:28px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center}
+    .cta{display:inline-block; padding:12px 18px; border-radius:14px; font-weight:800; text-decoration:none; color:#0b0f1a; background:linear-gradient(90deg, var(--accent), var(--accent-2)); border:1px solid rgba(255,255,255,.16)}
+    .cta.secondary{background:transparent; color:var(--ink); border-color:rgba(255,255,255,.18)}
+    .cta:hover{transform:translateY(-1px)}
+
+    /* ORB FIELD */
+    .orbs{position:fixed; inset:-12vmax; z-index:0; overflow:hidden; pointer-events:none}
+    .orb{position:absolute; border-radius:50%; opacity:.418; filter:blur(32px); mix-blend-mode:screen; will-change:transform}
+    .orb.light{background:radial-gradient(circle at 35% 35%, rgba(108,240,255,.77), transparent 60%)}
+    .orb.violet{background:radial-gradient(circle at 65% 65%, rgba(165,123,255,.77), transparent 60%)}
+    .orb.mint{background:radial-gradient(circle at 50% 50%, rgba(64,255,176,.605), transparent 60%)}
+    .orb.sun{background:radial-gradient(circle at 40% 40%, rgba(255,200,80,.495), transparent 60%)}
+    @keyframes sway{50%{transform:translate3d(var(--dx),var(--dy),0) scale(1.05)} 100%{transform:translate3d(0,0,0) scale(1)}}
+  </style>
+</head>
+<body>
+  <!-- Orb field background -->
+  <div id="orbs" class="orbs" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header>
+      <a class="brand" href="/">
+        <div class="brand-logo"></div>
+        <span class="brand-title">Kalan Computer Entertainment of America</span>
+      </a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="#" aria-current="page">About</a>
+      </nav>
+    </header>
+
+    <div class="breadcrumbs">
+      <a href="/projects.html">Projects</a> / <span>About</span>
+    </div>
+
+    <section class="hero">
+      <h1>About KCEA</h1>
+      <p>We build joyful, lasting experiences — a continuation of the 16‑bit spirit for a new generation — centered on physical play, true ownership, and creators first.</p>
+    </section>
+
+    <section class="grid">
+      <article class="box">
+        <h2>Mission: A Million Smiles</h2>
+        <p class="muted">More valuable than a million dollars is a million smiles.</p>
+        <p>We measure our success by delight — the couch‑co‑op laughter, the late‑night perseverance, the moments you’ll remember years from now. Profit keeps the lights on; smiles light the way. Everything we make strives to be fun to play, beautiful to hold, and worth sharing.</p>
+      </article>
+
+      <article class="box">
+        <h2>Preserve Physical Games</h2>
+        <p>Games are culture worth preserving. That’s why the KGx Numen platform embraces physical cartridges and tangible packaging. When you own a game, you should own the whole game — playable tomorrow, displayable forever.</p>
+        <p class="muted">We champion permanence in an age of disappearing downloads.</p>
+      </article>
+
+      <article class="box">
+        <h2>User Ownership</h2>
+        <p>Discs and cartridges live on your shelf, not behind a password. We prioritize designs that respect player ownership: no endless grinds to unlock what should be there, no pay‑to‑win schemes — just complete experiences from the moment you plug in.</p>
+      </article>
+
+      <article class="box">
+        <h2>Simple, Affordable Pathways</h2>
+        <p>Great ideas shouldn’t be locked behind closed doors. Our developer pathways lower the barrier to entry with practical tooling, documentation, and approachable licensing. Whether you’re a hobbyist or a studio, you’ll find a way to build for Numen without guesswork.</p>
+        <p class="muted">Create. Ship. Hold it in your hands.</p>
+      </article>
+
+      <article class="box">
+        <h2>Encouraging Creation</h2>
+        <p>We believe players can be makers. From sample projects to dev kits and cartridge‑first distribution, we encourage experimentation and shareable knowledge. The more creators there are, the more worlds there are to explore.</p>
+      </article>
+    </section>
+
+    <div class="cta-row">
+      <a class="cta" href="/pathways/devpath.html">Explore Developer Pathways →</a>
+      <a class="cta secondary" href="/projects.html">See Projects →</a>
+    </div>
+
+    <footer style="margin-top:40px; color:var(--muted); font-size:12px; text-align:center">
+      © <span id="y"></span> Kalan Computer Entertainment of America. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    // ORB FIELD SCRIPT
+    (function(){
+      const ORB_COUNT = 16;
+      const colors = ['light','violet','mint','sun'];
+      const root = document.getElementById('orbs');
+      const rand = (min,max)=>Math.random()*(max-min)+min;
+      const orbs = [];
+      function makeOrb(){
+        const el = document.createElement('div');
+        el.className = `orb ${colors[Math.floor(Math.random()*colors.length)]}`;
+        const size = rand(16, 38);
+        el.style.width = size + 'vmin';
+        el.style.height = size + 'vmin';
+        el.style.animation = `sway ${rand(8,16).toFixed(2)}s ease-in-out infinite alternate`;
+        el.style.setProperty('--dx', rand(-22,22)+'px');
+        el.style.setProperty('--dy', rand(-22,22)+'px');
+        root.appendChild(el);
+        const baseX = rand(-5, 100);
+        const baseY = rand(-5, 100);
+        const ampX = rand(10, 30);
+        const ampY = rand(10, 30);
+        const speed = rand(0.05, 0.16);
+        const phase = rand(0, Math.PI*2);
+        return {el, baseX, baseY, ampX, ampY, speed, phase};
+      }
+      for(let i=0;i<ORB_COUNT;i++) orbs.push(makeOrb());
+      let t0 = performance.now();
+      function frame(){
+        const t = (performance.now()-t0)/1000;
+        for(const o of orbs){
+          const x = o.baseX + Math.sin(t*o.speed + o.phase) * o.ampX;
+          const y = o.baseY + Math.cos(t*o.speed*0.9 + o.phase*1.3) * o.ampY;
+          o.el.style.transform = `translate(${x}vw, ${y}vh)`;
+        }
+        requestAnimationFrame(frame);
+      }
+      frame();
+    })();
+  </script>
+</body>
+</html>
