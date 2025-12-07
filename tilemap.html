@@ -285,7 +285,15 @@
 
       ctx.fillStyle = PATH_COLOR;
 
-      const thickness = tileSize * 0.5; // width of the path
+      // If this tile connects in all four directions (N+E+S+W),
+      // render it as a completely filled tile (solid pink),
+      // like the "full" tile in your 16‑tile set.
+      if (mask === 15) {
+        ctx.fillRect(x0, y0, tileSize, tileSize);
+        return;
+      }
+
+      const thickness = tileSize * 0.6; // width of the path
       const halfT = thickness / 2;
 
       // Center blob
