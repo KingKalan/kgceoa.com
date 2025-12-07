@@ -114,8 +114,8 @@
     <h1>Auto Path Editor</h1>
     <small>
       Tiles are 8×8. Map up to 64×64 tiles.<br>
-      You paint a <b>path mask</b>; the editor chooses one of 16 path tiles
-      (based on N/E/S/W neighbours) so you can draw continuous paths.
+      You just paint where the path is.<br>
+      Internally each path tile has a 4‑bit NESW mask (0–15).
     </small>
 
     <fieldset>
@@ -133,7 +133,7 @@
       <div style="margin-top:8px;">
         <button id="newMapBtn">New Map</button>
       </div>
-      <small>Max 64×64 tiles. New map clears everything.</small>
+      <small>New map clears all path data.</small>
     </fieldset>
 
     <fieldset>
@@ -142,16 +142,13 @@
         <button id="modePathBtn" class="selected">Paint Path</button>
         <button id="modeEraseBtn">Erase</button>
       </div>
-      <small>
-        Left-click to paint / erase. Drag to draw.<br>
-        The tile graphic changes automatically as neighbours change.
-      </small>
+      <small>Left‑click / drag to paint or erase tiles.</small>
     </fieldset>
 
     <fieldset>
       <legend>Zoom</legend>
       <input type="range" id="zoomSlider" min="1" max="6" value="4">
-      <small>Controls on-screen size of each 8×8 tile.</small>
+      <small>Controls on‑screen size of each 8×8 tile.</small>
     </fieldset>
 
     <fieldset>
@@ -162,9 +159,9 @@
       </div>
       <textarea id="exportArea" spellcheck="false"></textarea>
       <small>
-        Export format:<br>
+        Exported format:<br>
         { "width", "height", "tiles": [mask0, mask1, ...] }<br>
-        Each mask is a 4‑bit value (N,E,S,W) 0–15. 0 = empty.
+        Each tile is 0–15 (bitmask N,E,S,W).
       </small>
     </fieldset>
   </div>
@@ -177,71 +174,68 @@
 
   <script>
     // --- Config ---
-    const MAX_TILES = 64;
-    const TILE_PIXELS = 8;      // logical 8×8 tile
-    const GRID_COLOR = '#ff00ff';
-    const BG_COLOR = '#ffffff';
-    const PATH_COLOR = '#ff4b81';
+    const MAX_TILES   = 64;
+    const TILE_PIXELS = 8;              // logical 8×8 tile
+    const GRID_COLOR  = '#ff00ff';
+    const BG_COLOR    = '#ffffff';
+    const PATH_COLOR  = '#ff4b81';
 
     // --- State ---
-    let mapWidth = 16;
+    let mapWidth  = 16;
     let mapHeight = 16;
-    let zoom = 4;              // size of one logical pixel
-    let maskMap = [];          // 2D: [y][x] 0–15 (bitmask N,E,S,W)
-    let isPathMap = [];        // 2D: [y][x] 0/1 for quick neighbour checks
-    let paintMode = 'path';    // 'path' or 'erase'
+    let zoom      = 4;                  // scale factor for each logical pixel
+    let isPathMap = [];                 // [y][x] 0/1, whether this tile is part of the path
+    let maskMap   = [];                 // [y][x] 0–15 NESW mask
+    let paintMode = 'path';             // 'path' or 'erase'
 
     // --- DOM ---
-    const widthInput  = document.getElementById('widthInput');
-    const heightInput = document.getElementById('heightInput');
-    const newMapBtn   = document.getElementById('newMapBtn');
-    const zoomSlider  = document.getElementById('zoomSlider');
-    const exportBtn   = document.getElementById('exportBtn');
-    const importBtn   = document.getElementById('importBtn');
-    const exportArea  = document.getElementById('exportArea');
-    const modePathBtn = document.getElementById('modePathBtn');
-    const modeEraseBtn= document.getElementById('modeEraseBtn');
-    const canvas      = document.getElementById('mapCanvas');
-    const ctx         = canvas.getContext('2d');
+    const widthInput   = document.getElementById('widthInput');
+    const heightInput  = document.getElementById('heightInput');
+    const newMapBtn    = document.getElementById('newMapBtn');
+    const zoomSlider   = document.getElementById('zoomSlider');
+    const exportBtn    = document.getElementById('exportBtn');
+    const importBtn    = document.getElementById('importBtn');
+    const exportArea   = document.getElementById('exportArea');
+    const modePathBtn  = document.getElementById('modePathBtn');
+    const modeEraseBtn = document.getElementById('modeEraseBtn');
+    const canvas       = document.getElementById('mapCanvas');
+    const ctx          = canvas.getContext('2d');
 
     // --- Helpers ---
     function clamp(v, min, max) {
       return Math.max(min, Math.min(max, v));
     }
 
-    function createEmptyMaps(w, h) {
-      maskMap = [];
+    function allocMaps(w, h) {
       isPathMap = [];
+      maskMap   = [];
       for (let y = 0; y < h; y++) {
-        const rowMask = new Array(w).fill(0);
         const rowPath = new Array(w).fill(0);
-        maskMap.push(rowMask);
+        const rowMask = new Array(w).fill(0);
         isPathMap.push(rowPath);
+        maskMap.push(rowMask);
       }
     }
 
     function resizeCanvas() {
       const tileSize = TILE_PIXELS * zoom;
-      canvas.width = mapWidth * tileSize;
+      canvas.width  = mapWidth * tileSize;
       canvas.height = mapHeight * tileSize;
     }
 
+    // Compute NESW bitmask for a single tile
+    // bit0=N, bit1=E, bit2=S, bit3=W
     function computeMask(x, y) {
-      if (!isPathMap[y][x]) {
-        return 0;
-      }
+      if (!isPathMap[y][x]) return 0;
       let mask = 0;
-      // bit 0: North
-      if (y > 0 && isPathMap[y - 1][x]) mask |= 1;
-      // bit 1: East
-      if (x < mapWidth - 1 && isPathMap[y][x + 1]) mask |= 2;
-      // bit 2: South
-      if (y < mapHeight - 1 && isPathMap[y + 1][x]) mask |= 4;
-      // bit 3: West
-      if (x > 0 && isPathMap[y][x - 1]) mask |= 8;
+      if (y > 0 && isPathMap[y - 1][x])           mask |= 1; // N
+      if (x < mapWidth  - 1 && isPathMap[y][x+1]) mask |= 2; // E
+      if (y < mapHeight - 1 && isPathMap[y + 1][x]) mask |= 4; // S
+      if (x > 0 && isPathMap[y][x - 1])           mask |= 8; // W
       return mask;
     }
 
+    // Recompute mask for (x,y) and its four 4‑way neighbours
     function updateMasksAround(x, y) {
       const coords = [
         [x, y],
@@ -256,11 +250,22 @@
       }
     }
 
+    // Simple renderer: any non‑zero mask becomes a solid pink tile.
+    // The *shape* is handled later in your engine based on maskMap; here
+    // you only care about "path exists here" vs empty.
+    function drawPathTile(tx, ty, mask) {
+      if (mask === 0) return;
+      const tileSize = TILE_PIXELS * zoom;
+      const x0 = tx * tileSize;
+      const y0 = ty * tileSize;
+      ctx.fillStyle = PATH_COLOR;
+      ctx.fillRect(x0, y0, tileSize, tileSize);
+    }
+
     function drawGrid() {
       const tileSize = TILE_PIXELS * zoom;
       ctx.strokeStyle = GRID_COLOR;
       ctx.lineWidth = 1;
-
       ctx.beginPath();
       for (let x = 0; x <= mapWidth; x++) {
         const px = x * tileSize + 0.5;
@@ -275,49 +280,7 @@
       ctx.stroke();
     }
 
-    function drawPathTile(tx, ty, mask) {
-      if (mask === 0) return;
-      const tileSize = TILE_PIXELS * zoom;
-      const x0 = tx * tileSize;
-      const y0 = ty * tileSize;
-      const cx = x0 + tileSize / 2;
-      const cy = y0 + tileSize / 2;
-
-      ctx.fillStyle = PATH_COLOR;
-
-      // If this tile connects in all four directions (N+E+S+W),
-      // render it as a completely filled tile (solid pink),
-      // like the "full" tile in your 16‑tile set.
-      if (mask === 15) {
-        ctx.fillRect(x0, y0, tileSize, tileSize);
-        return;
-      }
-
-      const thickness = tileSize * 0.6; // width of the path
-      const halfT = thickness / 2;
-
-      // Center blob
-      ctx.fillRect(cx - halfT, cy - halfT, thickness, thickness);
-
-      // Arms based on mask: North (1), East (2), South (4), West (8)
-      if (mask & 1) { // North
-        ctx.fillRect(cx - halfT, y0, thickness, tileSize / 2);
-      }
-      if (mask & 2) { // East
-        ctx.fillRect(cx, cy - halfT, tileSize / 2, thickness);
-      }
-      if (mask & 4) { // South
-        ctx.fillRect(cx - halfT, cy, thickness, tileSize / 2);
-      }
-      if (mask & 8) { // West
-        ctx.fillRect(x0, cy - halfT, tileSize / 2, thickness);
-      }
-    }
-
     function renderMap() {
-      const tileSize = TILE_PIXELS * zoom;
-
-      // background
       ctx.fillStyle = BG_COLOR;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -333,42 +296,40 @@
       drawGrid();
     }
 
-    function toCanvasCoords(ev) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
+    function canvasToTile(ev) {
+      const rect   = canvas.getBoundingClientRect();
+      const scaleX = canvas.width  / rect.width;
       const scaleY = canvas.height / rect.height;
-      return {
-        x: (ev.clientX - rect.left) * scaleX,
-        y: (ev.clientY - rect.top) * scaleY
-      };
+      const px = (ev.clientX - rect.left) * scaleX;
+      const py = (ev.clientY - rect.top)  * scaleY;
+      const tileSize = TILE_PIXELS * zoom;
+      const tx = Math.floor(px / tileSize);
+      const ty = Math.floor(py / tileSize);
+      if (tx < 0 || ty < 0 || tx >= mapWidth || ty >= mapHeight) {
+        return null;
+      }
+      return { x: tx, y: ty };
     }
 
-    function handlePaint(ev) {
-      const pos = toCanvasCoords(ev);
-      const tileSize = TILE_PIXELS * zoom;
-      const tx = Math.floor(pos.x / tileSize);
-      const ty = Math.floor(pos.y / tileSize);
-
-      if (tx < 0 || ty < 0 || tx >= mapWidth || ty >= mapHeight) return;
-
-      const newIsPath = (paintMode === 'path') ? 1 : 0;
-      if (isPathMap[ty][tx] === newIsPath) return; // no change
-
-      isPathMap[ty][tx] = newIsPath;
-      updateMasksAround(tx, ty);
+    function applyPaint(ev) {
+      const t = canvasToTile(ev);
+      if (!t) return;
+      const newPath = (paintMode === 'path') ? 1 : 0;
+      if (isPathMap[t.y][t.x] === newPath) return;
+      isPathMap[t.y][t.x] = newPath;
+      updateMasksAround(t.x, t.y);
       renderMap();
     }
 
     // --- Event wiring ---
     newMapBtn.addEventListener('click', () => {
-      const w = clamp(parseInt(widthInput.value || '0', 10), 1, MAX_TILES);
+      const w = clamp(parseInt(widthInput.value  || '0', 10), 1, MAX_TILES);
       const h = clamp(parseInt(heightInput.value || '0', 10), 1, MAX_TILES);
-      mapWidth = w;
+      mapWidth  = w;
       mapHeight = h;
-      widthInput.value = w;
+      widthInput.value  = w;
       heightInput.value = h;
-
-      createEmptyMaps(mapWidth, mapHeight);
+      allocMaps(mapWidth, mapHeight);
       resizeCanvas();
       renderMap();
     });
@@ -379,14 +340,14 @@
       renderMap();
     });
 
-    canvas.addEventListener('mousedown', ev => {
+    canvas.addEventListener('mousedown', (ev) => {
       ev.preventDefault();
-      handlePaint(ev);
+      applyPaint(ev);
     });
 
-    canvas.addEventListener('mousemove', ev => {
+    canvas.addEventListener('mousemove', (ev) => {
       if (ev.buttons & 1) {
-        handlePaint(ev);
+        applyPaint(ev);
       }
     });
 
@@ -399,37 +360,32 @@
           tiles.push(maskMap[y][x] | 0);
         }
       }
-      const data = {
-        width: mapWidth,
-        height: mapHeight,
-        tiles
-      };
+      const data = { width: mapWidth, height: mapHeight, tiles };
       exportArea.value = JSON.stringify(data, null, 2);
     });
 
     importBtn.addEventListener('click', () => {
       try {
-        const data = JSON.parse(exportArea.value);
-        const w = clamp(parseInt(data.width, 10) || 0, 1, MAX_TILES);
+        const data  = JSON.parse(exportArea.value);
+        const w = clamp(parseInt(data.width, 10)  || 0, 1, MAX_TILES);
         const h = clamp(parseInt(data.height, 10) || 0, 1, MAX_TILES);
         const tiles = Array.isArray(data.tiles) ? data.tiles : [];
-
         if (tiles.length !== w * h) {
           alert('Tile data length does not match width×height.');
           return;
         }
 
-        mapWidth = w;
+        mapWidth  = w;
         mapHeight = h;
-        widthInput.value = w;
+        widthInput.value  = w;
         heightInput.value = h;
 
-        createEmptyMaps(mapWidth, mapHeight);
+        allocMaps(mapWidth, mapHeight);
         let i = 0;
-        for (let y = 0; y < h; y++) {
-          for (let x = 0; x < w; x++) {
+        for (let y = 0; y < mapHeight; y++) {
+          for (let x = 0; x < mapWidth; x++) {
             const mask = clamp(tiles[i++] | 0, 0, 15);
-            maskMap[y][x] = mask;
+            maskMap[y][x]   = mask;
             isPathMap[y][x] = mask ? 1 : 0;
           }
         }
@@ -441,7 +397,6 @@
       }
     });
 
-    // Paint mode toggles
     function setMode(mode) {
       paintMode = mode;
       if (mode === 'path') {
@@ -457,10 +412,9 @@
     modeEraseBtn.addEventListener('click', () => setMode('erase'));
 
     // --- Init ---
-    createEmptyMaps(mapWidth, mapHeight);
+    allocMaps(mapWidth, mapHeight);
     resizeCanvas();
     renderMap();
   </script>
 </body>
 </html>
-
