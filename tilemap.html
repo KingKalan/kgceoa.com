@@ -1,421 +1,1435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Auto Path Tilemap Editor (8×8, 64×64)</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #111;
-      color: #eee;
-      display: flex;
-      height: 100vh;
-    }
-    #sidebar {
-      width: 260px;
-      padding: 16px;
-      box-sizing: border-box;
-      background: #1b1b1b;
-      border-right: 1px solid #333;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    #main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-      box-sizing: border-box;
-    }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 18px;
-    }
-    fieldset {
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 8px 10px 10px;
-    }
-    legend {
-      padding: 0 4px;
-      font-size: 12px;
-      color: #aaa;
-    }
-    label {
-      font-size: 13px;
-    }
-    input[type="number"] {
-      width: 70px;
-      padding: 2px 4px;
-      margin-right: 4px;
-      border-radius: 4px;
-      border: 1px solid #444;
-      background: #222;
-      color: #eee;
-    }
-    input[type="range"] {
-      width: 100%;
-    }
-    button {
-      padding: 4px 8px;
-      border-radius: 4px;
-      border: 1px solid #666;
-      background: #333;
-      color: #eee;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    button:hover {
-      background: #444;
-    }
-    button.selected {
-      outline: 2px solid #fff;
-    }
-    #modeButtons {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-      flex-wrap: wrap;
-    }
-    #canvasWrapper {
-      flex: 1;
-      overflow: auto;
-      border: 1px solid #333;
-      background: #000;
-    }
-    #mapCanvas {
-      image-rendering: pixelated;
-      display: block;
-    }
-    #exportArea {
-      width: 100%;
-      height: 140px;
-      box-sizing: border-box;
-      background: #111;
-      color: #eee;
-      border-radius: 4px;
-      border: 1px solid #444;
-      font-family: monospace;
-      font-size: 11px;
-      padding: 6px;
-      resize: vertical;
-    }
-    small {
-      color: #999;
-      font-size: 11px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitmask Tilemap Painter</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Left Panel - Layers */
+#left-panel {
+    width: 200px;
+    background: #202038;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-right: 1px solid #333;
+}
+
+/* Center - Map Canvas */
+#center-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#toolbar {
+    background: #252545;
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+
+#canvas-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    background: #0d0d1a;
+}
+
+#map-canvas {
+    position: absolute;
+    cursor: crosshair;
+}
+
+/* Right Panel - Tileset Editor */
+#right-panel {
+    width: 320px;
+    background: #202038;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-left: 1px solid #333;
+    overflow-y: auto;
+}
+
+/* Common Styles */
+.panel-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8892b0;
+    margin-bottom: 4px;
+}
+
+button {
+    background: #2a2a4e;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #ccc;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+}
+button:hover { background: #3a3a5e; border-color: #666; }
+button.active { background: #3a4a4e; border-color: #6a9; color: #fff; }
+
+select, input[type="number"] {
+    background: #2a2a4e;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #eee;
+    padding: 6px 8px;
+    font-size: 13px;
+}
+
+.tool-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.separator {
+    width: 1px;
+    height: 24px;
+    background: #444;
+    margin: 0 4px;
+}
+
+/* Layer List */
+#layer-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.layer-item {
+    background: #2a2a4e;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.layer-item:hover { border-color: #666; }
+.layer-item.selected { border-color: #6a9; background: #3a4a4e; }
+.layer-item .color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #666;
+}
+.layer-item .name { flex: 1; font-size: 13px; }
+.layer-item .controls { display: flex; gap: 4px; }
+.layer-item .controls button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 12px;
+}
+
+/* Tileset Display */
+#tileset-canvas {
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: crosshair;
+    image-rendering: pixelated;
+}
+
+/* Bitmask Reference */
+#bitmask-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+    background: #1a1a2e;
+    padding: 4px;
+    border-radius: 4px;
+}
+.bitmask-cell {
+    aspect-ratio: 1;
+    background: #2a2a4e;
+    border: 1px solid #333;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #666;
+    cursor: pointer;
+}
+.bitmask-cell:hover { border-color: #6a9; }
+.bitmask-cell.highlighted { background: #3a4a4e; border-color: #6a9; }
+
+/* Color Picker */
+#color-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.color-row label {
+    width: 20px;
+    font-size: 12px;
+    color: #888;
+}
+.color-row input[type="range"] {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    background: #2a2a4e;
+    border-radius: 3px;
+}
+.color-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #5a8f6a;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.color-row span {
+    width: 24px;
+    font-size: 11px;
+    color: #888;
+    text-align: right;
+}
+#current-color {
+    width: 100%;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid #444;
+}
+
+/* Status Bar */
+#status-bar {
+    background: #1a1a2e;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: #666;
+    border-top: 1px solid #333;
+}
+</style>
 </head>
 <body>
-  <div id="sidebar">
-    <h1>Auto Path Editor</h1>
-    <small>
-      Tiles are 8×8. Map up to 64×64 tiles.<br>
-      You just paint where the path is.<br>
-      Internally each path tile has a 4‑bit NESW mask (0–15).
-    </small>
 
-    <fieldset>
-      <legend>Map Size (tiles)</legend>
-      <div>
-        <label>Width:
-          <input type="number" id="widthInput" min="1" max="64" value="16">
-        </label>
-      </div>
-      <div style="margin-top:4px;">
-        <label>Height:
-          <input type="number" id="heightInput" min="1" max="64" value="16">
-        </label>
-      </div>
-      <div style="margin-top:8px;">
-        <button id="newMapBtn">New Map</button>
-      </div>
-      <small>New map clears all path data.</small>
-    </fieldset>
-
-    <fieldset>
-      <legend>Paint Mode</legend>
-      <div id="modeButtons">
-        <button id="modePathBtn" class="selected">Paint Path</button>
-        <button id="modeEraseBtn">Erase</button>
-      </div>
-      <small>Left‑click / drag to paint or erase tiles.</small>
-    </fieldset>
-
-    <fieldset>
-      <legend>Zoom</legend>
-      <input type="range" id="zoomSlider" min="1" max="6" value="4">
-      <small>Controls on‑screen size of each 8×8 tile.</small>
-    </fieldset>
-
-    <fieldset>
-      <legend>Export / Import</legend>
-      <div style="display:flex; gap:4px; margin-bottom:6px;">
-        <button id="exportBtn">Export JSON</button>
-        <button id="importBtn">Import JSON</button>
-      </div>
-      <textarea id="exportArea" spellcheck="false"></textarea>
-      <small>
-        Exported format:<br>
-        { "width", "height", "tiles": [mask0, mask1, ...] }<br>
-        Each tile is 0–15 (bitmask N,E,S,W).
-      </small>
-    </fieldset>
-  </div>
-
-  <div id="main">
-    <div id="canvasWrapper">
-      <canvas id="mapCanvas"></canvas>
+<div id="left-panel">
+    <div>
+        <div class="panel-header">Paint Terrain</div>
+        <select id="paint-terrain" style="width: 100%;"></select>
     </div>
-  </div>
+    <div>
+        <div class="panel-header">Base Terrain</div>
+        <select id="base-terrain" style="width: 100%;"></select>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div class="panel-header">Layers</div>
+        <div id="layer-list"></div>
+    </div>
+    <button onclick="addTerrain()">+ Add Terrain</button>
+</div>
 
-  <script>
-    // --- Config ---
-    const MAX_TILES   = 64;
-    const TILE_PIXELS = 8;              // logical 8×8 tile
-    const GRID_COLOR  = '#ff00ff';
-    const BG_COLOR    = '#ffffff';
-    const PATH_COLOR  = '#ff4b81';
+<div id="center-panel">
+    <div id="toolbar">
+        <button class="tool-btn active" data-tool="brush" title="Brush (B)">🖌️</button>
+        <button class="tool-btn" data-tool="fill" title="Fill (G)">🪣</button>
+        <button class="tool-btn" data-tool="eraser" title="Eraser (E)">🧹</button>
+        <div class="separator"></div>
+        <label style="color: #888; font-size: 12px;">Size:</label>
+        <input type="number" id="brush-size" value="1" min="1" max="10" style="width: 50px;">
+        <div class="separator"></div>
+        <label style="color: #888; font-size: 12px;">Zoom:</label>
+        <span id="zoom-display" style="color: #aaa; font-size: 12px; width: 40px;">100%</span>
+        <div class="separator"></div>
+        <button onclick="openTilesetEditor()" title="Edit Tileset (T)">🎨 Tileset</button>
+    </div>
+    <div id="canvas-container">
+        <canvas id="map-canvas"></canvas>
+    </div>
+    <div id="status-bar">B: Brush | G: Fill | E: Eraser | T: Tileset | Scroll: Zoom | MMB: Pan</div>
+</div>
 
-    // --- State ---
-    let mapWidth  = 16;
-    let mapHeight = 16;
-    let zoom      = 4;                  // scale factor for each logical pixel
-    let isPathMap = [];                 // [y][x] 0/1, whether this tile is part of the path
-    let maskMap   = [];                 // [y][x] 0–15 NESW mask
-    let paintMode = 'path';             // 'path' or 'erase'
+<div id="right-panel" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="panel-header">Tileset Editor</div>
+        <button onclick="closeTilesetEditor()">✕</button>
+    </div>
+    
+    <div>
+        <label style="font-size: 12px; color: #888;">Editing:</label>
+        <select id="tileset-terrain" style="width: 100%; margin-top: 4px;"></select>
+    </div>
+    
+    <div>
+        <label style="font-size: 12px; color: #888;">Tile Size:</label>
+        <select id="tile-size" style="width: 100%; margin-top: 4px;">
+            <option value="8">8×8</option>
+            <option value="16" selected>16×16</option>
+            <option value="32">32×32</option>
+        </select>
+    </div>
+    
+    <div>
+        <div class="panel-header">Tileset (47 tiles)</div>
+        <canvas id="tileset-canvas"></canvas>
+        <div style="font-size: 11px; color: #666; margin-top: 4px;">
+            Click tile to edit • Right-click to pick color
+        </div>
+    </div>
+    
+    <div>
+        <div class="panel-header">Selected Tile (#<span id="selected-tile-id">0</span>)</div>
+        <canvas id="tile-edit-canvas" width="128" height="128" style="border: 1px solid #444; border-radius: 4px; cursor: crosshair; image-rendering: pixelated;"></canvas>
+    </div>
+    
+    <div id="color-picker">
+        <div class="panel-header">Color (RGB555)</div>
+        <div id="current-color"></div>
+        <div class="color-row">
+            <label>R</label>
+            <input type="range" id="color-r" min="0" max="31" value="16">
+            <span id="color-r-val">16</span>
+        </div>
+        <div class="color-row">
+            <label>G</label>
+            <input type="range" id="color-g" min="0" max="31" value="16">
+            <span id="color-g-val">16</span>
+        </div>
+        <div class="color-row">
+            <label>B</label>
+            <input type="range" id="color-b" min="0" max="31" value="16">
+            <span id="color-b-val">16</span>
+        </div>
+    </div>
+    
+    <div>
+        <div class="panel-header">Bitmask Reference</div>
+        <div id="bitmask-grid"></div>
+    </div>
+    
+    <button onclick="generateDefaultTileset()">Generate Default Tileset</button>
+    <button onclick="exportTileset()">Export PNG</button>
+</div>
 
-    // --- DOM ---
-    const widthInput   = document.getElementById('widthInput');
-    const heightInput  = document.getElementById('heightInput');
-    const newMapBtn    = document.getElementById('newMapBtn');
-    const zoomSlider   = document.getElementById('zoomSlider');
-    const exportBtn    = document.getElementById('exportBtn');
-    const importBtn    = document.getElementById('importBtn');
-    const exportArea   = document.getElementById('exportArea');
-    const modePathBtn  = document.getElementById('modePathBtn');
-    const modeEraseBtn = document.getElementById('modeEraseBtn');
-    const canvas       = document.getElementById('mapCanvas');
-    const ctx          = canvas.getContext('2d');
+<script>
+// ============ BITMASK AUTOTILE SYSTEM ============
+// 47-tile bitmask (Godot 3x3 minimal style)
+// Bits: N=1, E=2, S=4, W=8, NE=16, SE=32, SW=64, NW=128
+// Diagonals only count if both adjacent cardinals are present
 
-    // --- Helpers ---
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
+const BITMASK_TO_TILE = {};
+const TILE_TO_BITMASK = [];
+
+// Generate the 47 unique tile mappings
+function initBitmaskMappings() {
+    const validMasks = new Set();
+    
+    for (let mask = 0; mask < 256; mask++) {
+        // Normalize: diagonals only count if cardinals present
+        let normalized = mask & 0xF; // Keep cardinals
+        
+        const n = mask & 1, e = mask & 2, s = mask & 4, w = mask & 8;
+        const ne = mask & 16, se = mask & 32, sw = mask & 64, nw = mask & 128;
+        
+        if (n && e && ne) normalized |= 16;
+        if (s && e && se) normalized |= 32;
+        if (s && w && sw) normalized |= 64;
+        if (n && w && nw) normalized |= 128;
+        
+        validMasks.add(normalized);
     }
-
-    function allocMaps(w, h) {
-      isPathMap = [];
-      maskMap   = [];
-      for (let y = 0; y < h; y++) {
-        const rowPath = new Array(w).fill(0);
-        const rowMask = new Array(w).fill(0);
-        isPathMap.push(rowPath);
-        maskMap.push(rowMask);
-      }
+    
+    // Sort and create mappings
+    const sorted = [...validMasks].sort((a, b) => a - b);
+    sorted.forEach((mask, idx) => {
+        BITMASK_TO_TILE[mask] = idx;
+        TILE_TO_BITMASK[idx] = mask;
+    });
+    
+    // Map all 256 possible inputs to their normalized tile index
+    for (let mask = 0; mask < 256; mask++) {
+        let normalized = mask & 0xF;
+        const n = mask & 1, e = mask & 2, s = mask & 4, w = mask & 8;
+        if ((n && e) && (mask & 16)) normalized |= 16;
+        if ((s && e) && (mask & 32)) normalized |= 32;
+        if ((s && w) && (mask & 64)) normalized |= 64;
+        if ((n && w) && (mask & 128)) normalized |= 128;
+        BITMASK_TO_TILE[mask] = BITMASK_TO_TILE[normalized];
     }
+}
+initBitmaskMappings();
 
-    function resizeCanvas() {
-      const tileSize = TILE_PIXELS * zoom;
-      canvas.width  = mapWidth * tileSize;
-      canvas.height = mapHeight * tileSize;
-    }
+// ============ STATE ============
+const MAP_WIDTH = 64;
+const MAP_HEIGHT = 64;
+let TILE_SIZE = 16;
 
-    // Compute NESW bitmask for a single tile
-    // bit0=N, bit1=E, bit2=S, bit3=W
-    function computeMask(x, y) {
-      if (!isPathMap[y][x]) return 0;
-      let mask = 0;
-      if (y > 0 && isPathMap[y - 1][x])           mask |= 1; // N
-      if (x < mapWidth  - 1 && isPathMap[y][x+1]) mask |= 2; // E
-      if (y < mapHeight - 1 && isPathMap[y + 1][x]) mask |= 4; // S
-      if (x > 0 && isPathMap[y][x - 1])           mask |= 8; // W
-      return mask;
-    }
+const terrains = new Map();
+const layers = []; // [{id, terrainId, visible, tiles: Uint8Array}]
+let baseTerrainId = 'grass';
+let currentTerrainId = 'grass';
+let selectedLayerIdx = -1;
 
-    // Recompute mask for (x,y) and its four 4‑way neighbours
-    function updateMasksAround(x, y) {
-      const coords = [
-        [x, y],
-        [x, y - 1],
-        [x + 1, y],
-        [x, y + 1],
-        [x - 1, y]
-      ];
-      for (const [cx, cy] of coords) {
-        if (cx < 0 || cy < 0 || cx >= mapWidth || cy >= mapHeight) continue;
-        maskMap[cy][cx] = computeMask(cx, cy);
-      }
-    }
+let currentTool = 'brush';
+let brushSize = 1;
+let zoom = 2;
+let panX = 0, panY = 0;
+let isPanning = false;
+let isPainting = false;
+let lastPanPos = {x: 0, y: 0};
+let lastTile = {x: -1, y: -1};
 
-    // Simple renderer: any non‑zero mask becomes a solid pink tile.
-    // The *shape* is handled later in your engine based on maskMap; here
-    // you only care about "path exists here" vs empty.
-    function drawPathTile(tx, ty, mask) {
-      if (mask === 0) return;
-      const tileSize = TILE_PIXELS * zoom;
-      const x0 = tx * tileSize;
-      const y0 = ty * tileSize;
-      ctx.fillStyle = PATH_COLOR;
-      ctx.fillRect(x0, y0, tileSize, tileSize);
-    }
+// Tileset editor state
+let editingTerrainId = 'grass';
+let selectedTileIdx = 0;
+let currentColor = {r: 16, g: 16, b: 16};
+let tilesetEditorOpen = false;
 
-    function drawGrid() {
-      const tileSize = TILE_PIXELS * zoom;
-      ctx.strokeStyle = GRID_COLOR;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (let x = 0; x <= mapWidth; x++) {
-        const px = x * tileSize + 0.5;
-        ctx.moveTo(px, 0);
-        ctx.lineTo(px, canvas.height);
-      }
-      for (let y = 0; y <= mapHeight; y++) {
-        const py = y * tileSize + 0.5;
-        ctx.moveTo(0, py);
-        ctx.lineTo(canvas.width, py);
-      }
-      ctx.stroke();
-    }
-
-    function renderMap() {
-      ctx.fillStyle = BG_COLOR;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      for (let y = 0; y < mapHeight; y++) {
-        for (let x = 0; x < mapWidth; x++) {
-          const mask = maskMap[y][x];
-          if (mask) {
-            drawPathTile(x, y, mask);
-          }
+// ============ TERRAIN & TILESET ============
+class Terrain {
+    constructor(id, name, baseColor) {
+        this.id = id;
+        this.name = name;
+        this.baseColor = baseColor; // {r, g, b} in RGB555
+        this.tileSize = 16;
+        // 47 tiles, each is tileSize × tileSize pixels, stored as RGB555
+        this.tiles = [];
+        for (let i = 0; i < 47; i++) {
+            this.tiles.push(new Uint16Array(this.tileSize * this.tileSize));
         }
-      }
-
-      drawGrid();
+        this.generateDefaultTiles();
     }
-
-    function canvasToTile(ev) {
-      const rect   = canvas.getBoundingClientRect();
-      const scaleX = canvas.width  / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const px = (ev.clientX - rect.left) * scaleX;
-      const py = (ev.clientY - rect.top)  * scaleY;
-      const tileSize = TILE_PIXELS * zoom;
-      const tx = Math.floor(px / tileSize);
-      const ty = Math.floor(py / tileSize);
-      if (tx < 0 || ty < 0 || tx >= mapWidth || ty >= mapHeight) {
-        return null;
-      }
-      return { x: tx, y: ty };
-    }
-
-    function applyPaint(ev) {
-      const t = canvasToTile(ev);
-      if (!t) return;
-      const newPath = (paintMode === 'path') ? 1 : 0;
-      if (isPathMap[t.y][t.x] === newPath) return;
-      isPathMap[t.y][t.x] = newPath;
-      updateMasksAround(t.x, t.y);
-      renderMap();
-    }
-
-    // --- Event wiring ---
-    newMapBtn.addEventListener('click', () => {
-      const w = clamp(parseInt(widthInput.value  || '0', 10), 1, MAX_TILES);
-      const h = clamp(parseInt(heightInput.value || '0', 10), 1, MAX_TILES);
-      mapWidth  = w;
-      mapHeight = h;
-      widthInput.value  = w;
-      heightInput.value = h;
-      allocMaps(mapWidth, mapHeight);
-      resizeCanvas();
-      renderMap();
-    });
-
-    zoomSlider.addEventListener('input', () => {
-      zoom = clamp(parseInt(zoomSlider.value, 10), 1, 6);
-      resizeCanvas();
-      renderMap();
-    });
-
-    canvas.addEventListener('mousedown', (ev) => {
-      ev.preventDefault();
-      applyPaint(ev);
-    });
-
-    canvas.addEventListener('mousemove', (ev) => {
-      if (ev.buttons & 1) {
-        applyPaint(ev);
-      }
-    });
-
-    canvas.addEventListener('contextmenu', ev => ev.preventDefault());
-
-    exportBtn.addEventListener('click', () => {
-      const tiles = [];
-      for (let y = 0; y < mapHeight; y++) {
-        for (let x = 0; x < mapWidth; x++) {
-          tiles.push(maskMap[y][x] | 0);
+    
+    generateDefaultTiles() {
+        const {r, g, b} = this.baseColor;
+        const dark = {r: Math.max(0, r - 3), g: Math.max(0, g - 3), b: Math.max(0, b - 3)};
+        const light = {r: Math.min(31, r + 3), g: Math.min(31, g + 3), b: Math.min(31, b + 3)};
+        
+        for (let t = 0; t < 47; t++) {
+            const mask = TILE_TO_BITMASK[t];
+            this.generateTileFromMask(t, mask, {r, g, b}, dark, light);
         }
-      }
-      const data = { width: mapWidth, height: mapHeight, tiles };
-      exportArea.value = JSON.stringify(data, null, 2);
-    });
-
-    importBtn.addEventListener('click', () => {
-      try {
-        const data  = JSON.parse(exportArea.value);
-        const w = clamp(parseInt(data.width, 10)  || 0, 1, MAX_TILES);
-        const h = clamp(parseInt(data.height, 10) || 0, 1, MAX_TILES);
-        const tiles = Array.isArray(data.tiles) ? data.tiles : [];
-        if (tiles.length !== w * h) {
-          alert('Tile data length does not match width×height.');
-          return;
-        }
-
-        mapWidth  = w;
-        mapHeight = h;
-        widthInput.value  = w;
-        heightInput.value = h;
-
-        allocMaps(mapWidth, mapHeight);
-        let i = 0;
-        for (let y = 0; y < mapHeight; y++) {
-          for (let x = 0; x < mapWidth; x++) {
-            const mask = clamp(tiles[i++] | 0, 0, 15);
-            maskMap[y][x]   = mask;
-            isPathMap[y][x] = mask ? 1 : 0;
-          }
-        }
-
-        resizeCanvas();
-        renderMap();
-      } catch (e) {
-        alert('Failed to parse JSON.\n\n' + e.message);
-      }
-    });
-
-    function setMode(mode) {
-      paintMode = mode;
-      if (mode === 'path') {
-        modePathBtn.classList.add('selected');
-        modeEraseBtn.classList.remove('selected');
-      } else {
-        modeEraseBtn.classList.add('selected');
-        modePathBtn.classList.remove('selected');
-      }
     }
+    
+    generateTileFromMask(tileIdx, mask, base, dark, light) {
+        const size = this.tileSize;
+        const tile = this.tiles[tileIdx];
+        const half = size / 2;
+        
+        // Neighbor flags
+        const n = !!(mask & 1), e = !!(mask & 2), s = !!(mask & 4), w = !!(mask & 8);
+        const ne = !!(mask & 16), se = !!(mask & 32), sw = !!(mask & 64), nw = !!(mask & 128);
+        
+        for (let y = 0; y < size; y++) {
+            for (let x = 0; x < size; x++) {
+                let color = base;
+                let filled = true;
+                
+                // Determine which quadrant
+                const inN = y < half, inS = y >= half;
+                const inW = x < half, inE = x >= half;
+                
+                // Edge detection for this pixel
+                const edgeDist = 2;
+                const isNEdge = y < edgeDist;
+                const isSEdge = y >= size - edgeDist;
+                const isWEdge = x < edgeDist;
+                const isEEdge = x >= size - edgeDist;
+                
+                // Check if pixel should be filled based on neighbors
+                if (inN && !n && isNEdge) filled = false;
+                if (inS && !s && isSEdge) filled = false;
+                if (inW && !w && isWEdge) filled = false;
+                if (inE && !e && isEEdge) filled = false;
+                
+                // Corner handling
+                const cornerDist = 3;
+                if (inN && inW && !nw && x < cornerDist && y < cornerDist) {
+                    if (n && w) filled = (x + y > cornerDist); // Inner corner notch
+                    else filled = false;
+                }
+                if (inN && inE && !ne && x >= size - cornerDist && y < cornerDist) {
+                    if (n && e) filled = ((size - 1 - x) + y > cornerDist);
+                    else filled = false;
+                }
+                if (inS && inW && !sw && x < cornerDist && y >= size - cornerDist) {
+                    if (s && w) filled = (x + (size - 1 - y) > cornerDist);
+                    else filled = false;
+                }
+                if (inS && inE && !se && x >= size - cornerDist && y >= size - cornerDist) {
+                    if (s && e) filled = ((size - 1 - x) + (size - 1 - y) > cornerDist);
+                    else filled = false;
+                }
+                
+                // Outer corners (no cardinals)
+                if (!n && !w && inN && inW) {
+                    const dx = x, dy = y;
+                    if (dx * dx + dy * dy > (half * half)) filled = false;
+                }
+                if (!n && !e && inN && inE) {
+                    const dx = size - 1 - x, dy = y;
+                    if (dx * dx + dy * dy > (half * half)) filled = false;
+                }
+                if (!s && !w && inS && inW) {
+                    const dx = x, dy = size - 1 - y;
+                    if (dx * dx + dy * dy > (half * half)) filled = false;
+                }
+                if (!s && !e && inS && inE) {
+                    const dx = size - 1 - x, dy = size - 1 - y;
+                    if (dx * dx + dy * dy > (half * half)) filled = false;
+                }
+                
+                if (filled) {
+                    // Add some noise/texture
+                    const noise = (Math.random() - 0.5) * 2;
+                    if (noise > 0.3) color = light;
+                    else if (noise < -0.3) color = dark;
+                    
+                    tile[y * size + x] = (color.r) | (color.g << 5) | (color.b << 10);
+                } else {
+                    tile[y * size + x] = 0xFFFF; // Transparent marker
+                }
+            }
+        }
+    }
+    
+    resize(newSize) {
+        if (newSize === this.tileSize) return;
+        this.tileSize = newSize;
+        this.tiles = [];
+        for (let i = 0; i < 47; i++) {
+            this.tiles.push(new Uint16Array(newSize * newSize));
+        }
+        this.generateDefaultTiles();
+    }
+}
 
-    modePathBtn.addEventListener('click', () => setMode('path'));
-    modeEraseBtn.addEventListener('click', () => setMode('erase'));
-
-    // --- Init ---
-    allocMaps(mapWidth, mapHeight);
+// ============ INITIALIZATION ============
+function init() {
+    // Default terrains
+    addTerrainType('grass', 'Grass', {r: 10, g: 18, b: 13});
+    addTerrainType('water', 'Water', {r: 7, g: 15, b: 22});
+    addTerrainType('sand', 'Sand', {r: 26, g: 24, b: 15});
+    addTerrainType('dirt', 'Dirt', {r: 17, g: 13, b: 9});
+    addTerrainType('stone', 'Stone', {r: 15, g: 15, b: 17});
+    
+    // Base layer
+    layers.push({
+        id: 'base',
+        terrainId: baseTerrainId,
+        visible: true,
+        isBase: true,
+        tiles: new Uint8Array(MAP_WIDTH * MAP_HEIGHT)
+    });
+    
+    updateTerrainSelects();
+    updateLayerList();
+    setupEventListeners();
+    buildBitmaskGrid();
+    
+    // Initial render
     resizeCanvas();
-    renderMap();
-  </script>
+    render();
+}
+
+function addTerrainType(id, name, baseColor) {
+    terrains.set(id, new Terrain(id, name, baseColor));
+}
+
+// ============ LAYER MANAGEMENT ============
+function getOrCreateLayer(terrainId) {
+    let layer = layers.find(l => !l.isBase && l.terrainId === terrainId);
+    if (!layer) {
+        layer = {
+            id: `layer_${Date.now()}`,
+            terrainId: terrainId,
+            visible: true,
+            isBase: false,
+            tiles: new Uint8Array(MAP_WIDTH * MAP_HEIGHT)
+        };
+        layers.push(layer);
+        updateLayerList();
+    }
+    return layer;
+}
+
+function deleteLayer(terrainId) {
+    const idx = layers.findIndex(l => !l.isBase && l.terrainId === terrainId);
+    if (idx > 0) {
+        layers.splice(idx, 1);
+        updateLayerList();
+        render();
+    }
+}
+
+function toggleLayerVisibility(terrainId) {
+    const layer = layers.find(l => l.terrainId === terrainId);
+    if (layer) {
+        layer.visible = !layer.visible;
+        updateLayerList();
+        render();
+    }
+}
+
+function moveLayerUp(terrainId) {
+    const idx = layers.findIndex(l => l.terrainId === terrainId);
+    if (idx > 1) {
+        [layers[idx], layers[idx - 1]] = [layers[idx - 1], layers[idx]];
+        updateLayerList();
+        render();
+    }
+}
+
+function moveLayerDown(terrainId) {
+    const idx = layers.findIndex(l => l.terrainId === terrainId);
+    if (idx > 0 && idx < layers.length - 1) {
+        [layers[idx], layers[idx + 1]] = [layers[idx + 1], layers[idx]];
+        updateLayerList();
+        render();
+    }
+}
+
+// ============ UI UPDATES ============
+function updateTerrainSelects() {
+    const paintSel = document.getElementById('paint-terrain');
+    const baseSel = document.getElementById('base-terrain');
+    const tilesetSel = document.getElementById('tileset-terrain');
+    
+    [paintSel, baseSel, tilesetSel].forEach(sel => {
+        if (!sel) return;
+        sel.innerHTML = '';
+        terrains.forEach((t, id) => {
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = t.name;
+            sel.appendChild(opt);
+        });
+    });
+    
+    paintSel.value = currentTerrainId;
+    baseSel.value = baseTerrainId;
+    if (tilesetSel) tilesetSel.value = editingTerrainId;
+}
+
+function updateLayerList() {
+    const list = document.getElementById('layer-list');
+    list.innerHTML = '';
+    
+    // Show layers in reverse order (top to bottom)
+    for (let i = layers.length - 1; i >= 0; i--) {
+        const layer = layers[i];
+        const terrain = terrains.get(layer.terrainId);
+        if (!terrain) continue;
+        
+        const div = document.createElement('div');
+        div.className = 'layer-item' + (layer.terrainId === currentTerrainId ? ' selected' : '');
+        
+        const {r, g, b} = terrain.baseColor;
+        const colorHex = `rgb(${r * 8}, ${g * 8}, ${b * 8})`;
+        
+        div.innerHTML = `
+            <div class="color-swatch" style="background: ${colorHex}"></div>
+            <span class="name">${terrain.name}${layer.isBase ? ' (base)' : ''}</span>
+            <div class="controls">
+                ${!layer.isBase ? `
+                    <button onclick="event.stopPropagation(); moveLayerUp('${layer.terrainId}')" title="Move Up">▲</button>
+                    <button onclick="event.stopPropagation(); moveLayerDown('${layer.terrainId}')" title="Move Down">▼</button>
+                ` : ''}
+                <button onclick="event.stopPropagation(); toggleLayerVisibility('${layer.terrainId}')" title="Toggle Visibility">
+                    ${layer.visible ? '👁' : '○'}
+                </button>
+                ${!layer.isBase ? `
+                    <button onclick="event.stopPropagation(); deleteLayer('${layer.terrainId}')" title="Delete">✕</button>
+                ` : ''}
+            </div>
+        `;
+        
+        div.onclick = () => {
+            currentTerrainId = layer.terrainId;
+            document.getElementById('paint-terrain').value = currentTerrainId;
+            updateLayerList();
+        };
+        
+        list.appendChild(div);
+    }
+}
+
+// ============ AUTOTILE CALCULATION ============
+function calculateBitmask(layer, x, y) {
+    const getTile = (tx, ty) => {
+        if (tx < 0 || tx >= MAP_WIDTH || ty < 0 || ty >= MAP_HEIGHT) return false;
+        return layer.tiles[ty * MAP_WIDTH + tx] > 0;
+    };
+    
+    let mask = 0;
+    if (getTile(x, y - 1)) mask |= 1;   // N
+    if (getTile(x + 1, y)) mask |= 2;   // E
+    if (getTile(x, y + 1)) mask |= 4;   // S
+    if (getTile(x - 1, y)) mask |= 8;   // W
+    if (getTile(x + 1, y - 1)) mask |= 16;  // NE
+    if (getTile(x + 1, y + 1)) mask |= 32;  // SE
+    if (getTile(x - 1, y + 1)) mask |= 64;  // SW
+    if (getTile(x - 1, y - 1)) mask |= 128; // NW
+    
+    return mask;
+}
+
+// ============ RENDERING ============
+const mapCanvas = document.getElementById('map-canvas');
+const mapCtx = mapCanvas.getContext('2d');
+
+function resizeCanvas() {
+    const container = document.getElementById('canvas-container');
+    mapCanvas.width = container.clientWidth;
+    mapCanvas.height = container.clientHeight;
+    render();
+}
+
+function render() {
+    mapCtx.imageSmoothingEnabled = false;
+    mapCtx.fillStyle = '#0d0d1a';
+    mapCtx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
+    
+    const tileScreenSize = TILE_SIZE * zoom;
+    const startX = Math.floor(-panX / tileScreenSize);
+    const startY = Math.floor(-panY / tileScreenSize);
+    const endX = Math.min(MAP_WIDTH, startX + Math.ceil(mapCanvas.width / tileScreenSize) + 1);
+    const endY = Math.min(MAP_HEIGHT, startY + Math.ceil(mapCanvas.height / tileScreenSize) + 1);
+    
+    // Create offscreen buffer for tile rendering
+    const tileBuffer = document.createElement('canvas');
+    tileBuffer.width = TILE_SIZE;
+    tileBuffer.height = TILE_SIZE;
+    const tileCtx = tileBuffer.getContext('2d');
+    const imageData = tileCtx.createImageData(TILE_SIZE, TILE_SIZE);
+    
+    for (let y = Math.max(0, startY); y < endY; y++) {
+        for (let x = Math.max(0, startX); x < endX; x++) {
+            const screenX = x * tileScreenSize + panX;
+            const screenY = y * tileScreenSize + panY;
+            
+            // Draw base terrain
+            const baseTerrain = terrains.get(baseTerrainId);
+            if (baseTerrain) {
+                drawTile(tileCtx, imageData, baseTerrain, 46, x, y); // Full tile for base
+                mapCtx.drawImage(tileBuffer, screenX, screenY, tileScreenSize, tileScreenSize);
+            }
+            
+            // Draw paint layers
+            for (let li = 1; li < layers.length; li++) {
+                const layer = layers[li];
+                if (!layer.visible) continue;
+                
+                const idx = y * MAP_WIDTH + x;
+                if (!layer.tiles[idx]) continue;
+                
+                const terrain = terrains.get(layer.terrainId);
+                if (!terrain) continue;
+                
+                const mask = calculateBitmask(layer, x, y);
+                const tileIdx = BITMASK_TO_TILE[mask];
+                
+                drawTile(tileCtx, imageData, terrain, tileIdx, x, y);
+                mapCtx.drawImage(tileBuffer, screenX, screenY, tileScreenSize, tileScreenSize);
+            }
+        }
+    }
+    
+    // Grid
+    if (zoom >= 1) {
+        mapCtx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+        mapCtx.lineWidth = 1;
+        mapCtx.beginPath();
+        
+        for (let x = Math.max(0, startX); x <= endX; x++) {
+            const screenX = x * tileScreenSize + panX;
+            mapCtx.moveTo(screenX, 0);
+            mapCtx.lineTo(screenX, mapCanvas.height);
+        }
+        for (let y = Math.max(0, startY); y <= endY; y++) {
+            const screenY = y * tileScreenSize + panY;
+            mapCtx.moveTo(0, screenY);
+            mapCtx.lineTo(mapCanvas.width, screenY);
+        }
+        mapCtx.stroke();
+    }
+}
+
+function drawTile(ctx, imageData, terrain, tileIdx, mapX, mapY) {
+    const tile = terrain.tiles[tileIdx];
+    const size = terrain.tileSize;
+    const data = imageData.data;
+    
+    // Handle size mismatch
+    const scale = TILE_SIZE / size;
+    
+    for (let y = 0; y < TILE_SIZE; y++) {
+        for (let x = 0; x < TILE_SIZE; x++) {
+            const srcX = Math.floor(x / scale);
+            const srcY = Math.floor(y / scale);
+            const pixel = tile[srcY * size + srcX];
+            const i = (y * TILE_SIZE + x) * 4;
+            
+            if (pixel === 0xFFFF) {
+                // Transparent
+                data[i] = data[i + 1] = data[i + 2] = data[i + 3] = 0;
+            } else {
+                const r = (pixel & 0x1F) * 8;
+                const g = ((pixel >> 5) & 0x1F) * 8;
+                const b = ((pixel >> 10) & 0x1F) * 8;
+                data[i] = r;
+                data[i + 1] = g;
+                data[i + 2] = b;
+                data[i + 3] = 255;
+            }
+        }
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+}
+
+// ============ TOOLS ============
+function screenToTile(x, y) {
+    const tileScreenSize = TILE_SIZE * zoom;
+    return {
+        x: Math.floor((x - panX) / tileScreenSize),
+        y: Math.floor((y - panY) / tileScreenSize)
+    };
+}
+
+function paintAt(tx, ty, erase = false) {
+    if (tx < 0 || tx >= MAP_WIDTH || ty < 0 || ty >= MAP_HEIGHT) return;
+    
+    const half = Math.floor(brushSize / 2);
+    
+    for (let dy = 0; dy < brushSize; dy++) {
+        for (let dx = 0; dx < brushSize; dx++) {
+            const x = tx - half + dx;
+            const y = ty - half + dy;
+            if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) continue;
+            
+            const idx = y * MAP_WIDTH + x;
+            
+            if (erase) {
+                // Erase from all paint layers
+                for (let li = 1; li < layers.length; li++) {
+                    layers[li].tiles[idx] = 0;
+                }
+            } else {
+                // Paint on current terrain's layer
+                const layer = getOrCreateLayer(currentTerrainId);
+                layer.tiles[idx] = 1;
+                
+                // Remove from other paint layers
+                for (let li = 1; li < layers.length; li++) {
+                    if (layers[li].terrainId !== currentTerrainId) {
+                        layers[li].tiles[idx] = 0;
+                    }
+                }
+            }
+        }
+    }
+    
+    render();
+}
+
+function bucketFill(startX, startY, erase = false) {
+    if (startX < 0 || startX >= MAP_WIDTH || startY < 0 || startY >= MAP_HEIGHT) return;
+    
+    // Find what terrain is currently at this position
+    let targetTerrainId = baseTerrainId;
+    for (let li = layers.length - 1; li >= 1; li--) {
+        const idx = startY * MAP_WIDTH + startX;
+        if (layers[li].tiles[idx]) {
+            targetTerrainId = layers[li].terrainId;
+            break;
+        }
+    }
+    
+    if (!erase && targetTerrainId === currentTerrainId) return;
+    
+    const targetLayer = erase ? null : getOrCreateLayer(currentTerrainId);
+    const visited = new Set();
+    const queue = [[startX, startY]];
+    
+    const isSameTerrain = (x, y) => {
+        if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) return false;
+        
+        let terrainAtPos = baseTerrainId;
+        for (let li = layers.length - 1; li >= 1; li--) {
+            const idx = y * MAP_WIDTH + x;
+            if (layers[li].tiles[idx]) {
+                terrainAtPos = layers[li].terrainId;
+                break;
+            }
+        }
+        return terrainAtPos === targetTerrainId;
+    };
+    
+    while (queue.length > 0) {
+        const [x, y] = queue.shift();
+        const key = `${x},${y}`;
+        
+        if (visited.has(key)) continue;
+        if (!isSameTerrain(x, y)) continue;
+        
+        visited.add(key);
+        
+        const idx = y * MAP_WIDTH + x;
+        
+        if (erase) {
+            for (let li = 1; li < layers.length; li++) {
+                layers[li].tiles[idx] = 0;
+            }
+        } else {
+            targetLayer.tiles[idx] = 1;
+            for (let li = 1; li < layers.length; li++) {
+                if (layers[li].terrainId !== currentTerrainId) {
+                    layers[li].tiles[idx] = 0;
+                }
+            }
+        }
+        
+        queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+    }
+    
+    render();
+}
+
+// ============ EVENT HANDLING ============
+function setupEventListeners() {
+    // Tool buttons
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTool = btn.dataset.tool;
+        };
+    });
+    
+    // Terrain selects
+    document.getElementById('paint-terrain').onchange = (e) => {
+        currentTerrainId = e.target.value;
+        updateLayerList();
+    };
+    
+    document.getElementById('base-terrain').onchange = (e) => {
+        baseTerrainId = e.target.value;
+        layers[0].terrainId = baseTerrainId;
+        render();
+    };
+    
+    // Brush size
+    document.getElementById('brush-size').onchange = (e) => {
+        brushSize = parseInt(e.target.value) || 1;
+    };
+    
+    // Canvas events
+    mapCanvas.onmousedown = (e) => {
+        if (e.button === 1) { // Middle mouse
+            isPanning = true;
+            lastPanPos = {x: e.clientX, y: e.clientY};
+            mapCanvas.style.cursor = 'grabbing';
+        } else if (e.button === 0 || e.button === 2) {
+            isPainting = true;
+            const rect = mapCanvas.getBoundingClientRect();
+            const tile = screenToTile(e.clientX - rect.left, e.clientY - rect.top);
+            lastTile = tile;
+            
+            const erase = currentTool === 'eraser' || e.button === 2;
+            
+            if (currentTool === 'fill') {
+                bucketFill(tile.x, tile.y, erase);
+            } else {
+                paintAt(tile.x, tile.y, erase);
+            }
+        }
+    };
+    
+    mapCanvas.onmousemove = (e) => {
+        if (isPanning) {
+            panX += e.clientX - lastPanPos.x;
+            panY += e.clientY - lastPanPos.y;
+            lastPanPos = {x: e.clientX, y: e.clientY};
+            render();
+        } else if (isPainting && currentTool !== 'fill') {
+            const rect = mapCanvas.getBoundingClientRect();
+            const tile = screenToTile(e.clientX - rect.left, e.clientY - rect.top);
+            
+            if (tile.x !== lastTile.x || tile.y !== lastTile.y) {
+                const erase = currentTool === 'eraser' || e.buttons === 2;
+                paintAt(tile.x, tile.y, erase);
+                lastTile = tile;
+            }
+        }
+    };
+    
+    mapCanvas.onmouseup = mapCanvas.onmouseleave = () => {
+        isPanning = false;
+        isPainting = false;
+        mapCanvas.style.cursor = 'crosshair';
+    };
+    
+    mapCanvas.onwheel = (e) => {
+        e.preventDefault();
+        const rect = mapCanvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        const oldZoom = zoom;
+        zoom *= e.deltaY < 0 ? 1.2 : 0.8;
+        zoom = Math.max(0.25, Math.min(8, zoom));
+        
+        // Zoom toward mouse position
+        const scale = zoom / oldZoom;
+        panX = mouseX - (mouseX - panX) * scale;
+        panY = mouseY - (mouseY - panY) * scale;
+        
+        document.getElementById('zoom-display').textContent = Math.round(zoom * 100) + '%';
+        render();
+    };
+    
+    mapCanvas.oncontextmenu = (e) => e.preventDefault();
+    
+    // Keyboard shortcuts
+    document.onkeydown = (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+        
+        switch (e.key.toLowerCase()) {
+            case 'b':
+                document.querySelector('[data-tool="brush"]').click();
+                break;
+            case 'g':
+                document.querySelector('[data-tool="fill"]').click();
+                break;
+            case 'e':
+                document.querySelector('[data-tool="eraser"]').click();
+                break;
+            case 't':
+                if (tilesetEditorOpen) closeTilesetEditor();
+                else openTilesetEditor();
+                break;
+        }
+    };
+    
+    // Window resize
+    window.onresize = resizeCanvas;
+    
+    // Tileset editor events
+    setupTilesetEditorEvents();
+}
+
+// ============ TILESET EDITOR ============
+function openTilesetEditor() {
+    tilesetEditorOpen = true;
+    document.getElementById('right-panel').style.display = 'flex';
+    editingTerrainId = currentTerrainId;
+    document.getElementById('tileset-terrain').value = editingTerrainId;
+    updateTilesetDisplay();
+    updateTileEditCanvas();
+    resizeCanvas();
+}
+
+function closeTilesetEditor() {
+    tilesetEditorOpen = false;
+    document.getElementById('right-panel').style.display = 'none';
+    resizeCanvas();
+}
+
+function setupTilesetEditorEvents() {
+    const tilesetCanvas = document.getElementById('tileset-canvas');
+    const tileEditCanvas = document.getElementById('tile-edit-canvas');
+    
+    // Terrain selector
+    document.getElementById('tileset-terrain').onchange = (e) => {
+        editingTerrainId = e.target.value;
+        updateTilesetDisplay();
+        updateTileEditCanvas();
+    };
+    
+    // Tile size
+    document.getElementById('tile-size').onchange = (e) => {
+        const newSize = parseInt(e.target.value);
+        TILE_SIZE = newSize;
+        terrains.forEach(t => t.resize(newSize));
+        updateTilesetDisplay();
+        updateTileEditCanvas();
+        render();
+    };
+    
+    // Tileset click
+    tilesetCanvas.onclick = (e) => {
+        const rect = tilesetCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const tilesPerRow = 8;
+        const displaySize = tilesetCanvas.width / tilesPerRow;
+        
+        const tx = Math.floor(x / displaySize);
+        const ty = Math.floor(y / displaySize);
+        const idx = ty * tilesPerRow + tx;
+        
+        if (idx < 47) {
+            selectedTileIdx = idx;
+            document.getElementById('selected-tile-id').textContent = idx;
+            updateTileEditCanvas();
+            highlightBitmaskCell(idx);
+        }
+    };
+    
+    tilesetCanvas.oncontextmenu = (e) => {
+        e.preventDefault();
+        // Pick color from tileset
+        const rect = tilesetCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const terrain = terrains.get(editingTerrainId);
+        if (!terrain) return;
+        
+        const tilesPerRow = 8;
+        const displaySize = tilesetCanvas.width / tilesPerRow;
+        
+        const tx = Math.floor(x / displaySize);
+        const ty = Math.floor(y / displaySize);
+        const idx = ty * tilesPerRow + tx;
+        
+        if (idx < 47) {
+            const localX = Math.floor((x % displaySize) / displaySize * terrain.tileSize);
+            const localY = Math.floor((y % displaySize) / displaySize * terrain.tileSize);
+            const pixel = terrain.tiles[idx][localY * terrain.tileSize + localX];
+            
+            if (pixel !== 0xFFFF) {
+                currentColor = {
+                    r: pixel & 0x1F,
+                    g: (pixel >> 5) & 0x1F,
+                    b: (pixel >> 10) & 0x1F
+                };
+                updateColorPicker();
+            }
+        }
+    };
+    
+    // Tile edit canvas
+    let tileEditPainting = false;
+    
+    tileEditCanvas.onmousedown = (e) => {
+        if (e.button === 2) {
+            // Pick color
+            const terrain = terrains.get(editingTerrainId);
+            if (!terrain) return;
+            
+            const rect = tileEditCanvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / rect.width * terrain.tileSize);
+            const y = Math.floor((e.clientY - rect.top) / rect.height * terrain.tileSize);
+            
+            const pixel = terrain.tiles[selectedTileIdx][y * terrain.tileSize + x];
+            if (pixel !== 0xFFFF) {
+                currentColor = {
+                    r: pixel & 0x1F,
+                    g: (pixel >> 5) & 0x1F,
+                    b: (pixel >> 10) & 0x1F
+                };
+                updateColorPicker();
+            }
+        } else {
+            tileEditPainting = true;
+            paintTilePixel(e);
+        }
+    };
+    
+    tileEditCanvas.onmousemove = (e) => {
+        if (tileEditPainting) paintTilePixel(e);
+    };
+    
+    tileEditCanvas.onmouseup = tileEditCanvas.onmouseleave = () => {
+        tileEditPainting = false;
+    };
+    
+    tileEditCanvas.oncontextmenu = (e) => e.preventDefault();
+    
+    // Color sliders
+    ['r', 'g', 'b'].forEach(c => {
+        const slider = document.getElementById(`color-${c}`);
+        slider.oninput = () => {
+            currentColor[c] = parseInt(slider.value);
+            document.getElementById(`color-${c}-val`).textContent = slider.value;
+            updateColorPreview();
+        };
+    });
+}
+
+function paintTilePixel(e) {
+    const terrain = terrains.get(editingTerrainId);
+    if (!terrain) return;
+    
+    const canvas = document.getElementById('tile-edit-canvas');
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / rect.width * terrain.tileSize);
+    const y = Math.floor((e.clientY - rect.top) / rect.height * terrain.tileSize);
+    
+    if (x >= 0 && x < terrain.tileSize && y >= 0 && y < terrain.tileSize) {
+        const pixel = (currentColor.r) | (currentColor.g << 5) | (currentColor.b << 10);
+        terrain.tiles[selectedTileIdx][y * terrain.tileSize + x] = pixel;
+        updateTileEditCanvas();
+        updateTilesetDisplay();
+        render();
+    }
+}
+
+function updateTilesetDisplay() {
+    const canvas = document.getElementById('tileset-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    const terrain = terrains.get(editingTerrainId);
+    if (!terrain) return;
+    
+    const tilesPerRow = 8;
+    const displaySize = 32;
+    canvas.width = tilesPerRow * displaySize;
+    canvas.height = Math.ceil(47 / tilesPerRow) * displaySize;
+    
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const tileBuffer = document.createElement('canvas');
+    tileBuffer.width = terrain.tileSize;
+    tileBuffer.height = terrain.tileSize;
+    const tileCtx = tileBuffer.getContext('2d');
+    const imageData = tileCtx.createImageData(terrain.tileSize, terrain.tileSize);
+    
+    for (let i = 0; i < 47; i++) {
+        const tile = terrain.tiles[i];
+        const data = imageData.data;
+        
+        for (let y = 0; y < terrain.tileSize; y++) {
+            for (let x = 0; x < terrain.tileSize; x++) {
+                const pixel = tile[y * terrain.tileSize + x];
+                const idx = (y * terrain.tileSize + x) * 4;
+                
+                if (pixel === 0xFFFF) {
+                    // Checkerboard for transparency
+                    const checker = ((x + y) % 2 === 0) ? 40 : 30;
+                    data[idx] = data[idx + 1] = data[idx + 2] = checker;
+                    data[idx + 3] = 255;
+                } else {
+                    data[idx] = (pixel & 0x1F) * 8;
+                    data[idx + 1] = ((pixel >> 5) & 0x1F) * 8;
+                    data[idx + 2] = ((pixel >> 10) & 0x1F) * 8;
+                    data[idx + 3] = 255;
+                }
+            }
+        }
+        
+        tileCtx.putImageData(imageData, 0, 0);
+        
+        const tx = (i % tilesPerRow) * displaySize;
+        const ty = Math.floor(i / tilesPerRow) * displaySize;
+        ctx.drawImage(tileBuffer, tx, ty, displaySize, displaySize);
+        
+        // Highlight selected
+        if (i === selectedTileIdx) {
+            ctx.strokeStyle = '#6a9';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(tx + 1, ty + 1, displaySize - 2, displaySize - 2);
+        }
+    }
+}
+
+function updateTileEditCanvas() {
+    const canvas = document.getElementById('tile-edit-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    const terrain = terrains.get(editingTerrainId);
+    if (!terrain) return;
+    
+    const tile = terrain.tiles[selectedTileIdx];
+    const size = terrain.tileSize;
+    const pixelSize = canvas.width / size;
+    
+    ctx.imageSmoothingEnabled = false;
+    
+    for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+            const pixel = tile[y * size + x];
+            
+            if (pixel === 0xFFFF) {
+                const checker = ((x + y) % 2 === 0) ? '#282838' : '#1e1e2e';
+                ctx.fillStyle = checker;
+            } else {
+                const r = (pixel & 0x1F) * 8;
+                const g = ((pixel >> 5) & 0x1F) * 8;
+                const b = ((pixel >> 10) & 0x1F) * 8;
+                ctx.fillStyle = `rgb(${r},${g},${b})`;
+            }
+            
+            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        }
+    }
+    
+    // Grid
+    if (pixelSize >= 4) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= size; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * pixelSize, 0);
+            ctx.lineTo(i * pixelSize, canvas.height);
+            ctx.moveTo(0, i * pixelSize);
+            ctx.lineTo(canvas.width, i * pixelSize);
+            ctx.stroke();
+        }
+    }
+}
+
+function updateColorPicker() {
+    document.getElementById('color-r').value = currentColor.r;
+    document.getElementById('color-g').value = currentColor.g;
+    document.getElementById('color-b').value = currentColor.b;
+    document.getElementById('color-r-val').textContent = currentColor.r;
+    document.getElementById('color-g-val').textContent = currentColor.g;
+    document.getElementById('color-b-val').textContent = currentColor.b;
+    updateColorPreview();
+}
+
+function updateColorPreview() {
+    const {r, g, b} = currentColor;
+    document.getElementById('current-color').style.background = 
+        `rgb(${r * 8}, ${g * 8}, ${b * 8})`;
+}
+
+function buildBitmaskGrid() {
+    const grid = document.getElementById('bitmask-grid');
+    grid.innerHTML = '';
+    
+    for (let i = 0; i < 47; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'bitmask-cell';
+        cell.textContent = i;
+        cell.title = `Tile ${i}\nMask: ${TILE_TO_BITMASK[i]}`;
+        cell.onclick = () => {
+            selectedTileIdx = i;
+            document.getElementById('selected-tile-id').textContent = i;
+            updateTileEditCanvas();
+            updateTilesetDisplay();
+            highlightBitmaskCell(i);
+        };
+        grid.appendChild(cell);
+    }
+}
+
+function highlightBitmaskCell(idx) {
+    document.querySelectorAll('.bitmask-cell').forEach((cell, i) => {
+        cell.classList.toggle('highlighted', i === idx);
+    });
+}
+
+function generateDefaultTileset() {
+    const terrain = terrains.get(editingTerrainId);
+    if (terrain) {
+        terrain.generateDefaultTiles();
+        updateTilesetDisplay();
+        updateTileEditCanvas();
+        render();
+    }
+}
+
+function exportTileset() {
+    const terrain = terrains.get(editingTerrainId);
+    if (!terrain) return;
+    
+    const tilesPerRow = 8;
+    const size = terrain.tileSize;
+    const canvas = document.createElement('canvas');
+    canvas.width = tilesPerRow * size;
+    canvas.height = Math.ceil(47 / tilesPerRow) * size;
+    const ctx = canvas.getContext('2d');
+    
+    const imageData = ctx.createImageData(size, size);
+    
+    for (let i = 0; i < 47; i++) {
+        const tile = terrain.tiles[i];
+        const data = imageData.data;
+        
+        for (let y = 0; y < size; y++) {
+            for (let x = 0; x < size; x++) {
+                const pixel = tile[y * size + x];
+                const idx = (y * size + x) * 4;
+                
+                if (pixel === 0xFFFF) {
+                    data[idx] = data[idx + 1] = data[idx + 2] = data[idx + 3] = 0;
+                } else {
+                    data[idx] = (pixel & 0x1F) * 8;
+                    data[idx + 1] = ((pixel >> 5) & 0x1F) * 8;
+                    data[idx + 2] = ((pixel >> 10) & 0x1F) * 8;
+                    data[idx + 3] = 255;
+                }
+            }
+        }
+        
+        const tx = (i % tilesPerRow) * size;
+        const ty = Math.floor(i / tilesPerRow) * size;
+        ctx.putImageData(imageData, tx, ty);
+    }
+    
+    const link = document.createElement('a');
+    link.download = `${terrain.name.toLowerCase()}_tileset.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+function addTerrain() {
+    const name = prompt('Terrain name:');
+    if (!name) return;
+    
+    const id = name.toLowerCase().replace(/\s+/g, '_');
+    if (terrains.has(id)) {
+        alert('Terrain already exists!');
+        return;
+    }
+    
+    // Random base color
+    const baseColor = {
+        r: Math.floor(Math.random() * 24) + 4,
+        g: Math.floor(Math.random() * 24) + 4,
+        b: Math.floor(Math.random() * 24) + 4
+    };
+    
+    addTerrainType(id, name, baseColor);
+    updateTerrainSelects();
+}
+
+// Initialize
+updateColorPreview();
+init();
+</script>
 </body>
 </html>
-
