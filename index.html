@@ -1,37 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <title>SnesJS</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SANo Model Viewer</title>
+<style>
+body{margin:0;background:#050511;color:white;font-family:Arial,sans-serif;}
+header{text-align:center;padding:20px;border-bottom:2px solid #4f43ae;}
+h1{color:#38e8ff;}
+#viewer{width:100vw;height:90vh;}
+</style>
 </head>
 <body>
-  <input id="rom" type="file">
-  <input id="ishirom" type="checkbox"> HiROM
-  <button id="pause">Pause</button>
-  <button id="reset">Reset</button>
-  <button id="hardreset">Power cycle</button>
-  <button id="runframe">Run 1 frame</button><br>
-  <canvas id="output"></canvas>
-  <pre id="log"></pre>
-  <p>
-    SnesJs, by angelo_wf. <a href="spcplayer.html">SpcJs</a>.<br>
-    Source on <a href="https://github.com/angelo-wf/SnesJs">Github</a>.
-  </p>
+<header>
+<h1>SANo Development Model</h1>
+<p>Current shell prototype</p>
+</header>
+<div id="viewer"></div>
 
-  <script src="lib/zip.js"></script>
-  <script src="lib/inflate.js"></script>
+<script type="module">
+import * as THREE from "https://unpkg.com/three@0.164.1/build/three.module.js";
+import { OrbitControls } from "https://unpkg.com/three@0.164.1/examples/jsm/controls/OrbitControls.js";
+import { STLLoader } from "https://unpkg.com/three@0.164.1/examples/jsm/loaders/STLLoader.js";
 
-  <script src="snes/cart.js"></script>
-  <script src="snes/dsp.js"></script>
-  <script src="snes/spc.js"></script>
-  <script src="snes/apu.js"></script>
-  <script src="snes/pipu.js"></script>
-  <script src="snes/cpu.js"></script>
-  <script src="snes/snes.js"></script>
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050511);
 
-  <script src="js/audio.js"></script>
-  <script src="js/trace.js"></script>
-  <script src="js/main.js"></script>
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 10000);
+camera.position.set(0,100,250);
 
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.getElementById("viewer").appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera,renderer.domElement);
+controls.enableDamping = true;
+
+scene.add(new THREE.AmbientLight(0x404040,2));
+
+const light1 = new THREE.DirectionalLight(0x38e8ff,2);
+light1.position.set(100,100,100);
+scene.add(light1);
+
+const light2 = new THREE.DirectionalLight(0xffffff,1);
+light2.position.set(-100,50,-100);
+scene.add(light2);
+
+new STLLoader().load("shell.stl",(geometry)=>{
+    geometry.center();
+    const mesh = new THREE.Mesh(
+        geometry,
+        new THREE.MeshPhongMaterial({color:0x38e8ff,shininess:80})
+    );
+    scene.add(mesh);
+});
+
+function animate(){
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener("resize",()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+});
+</script>
 </body>
 </html>
