@@ -1,72 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SANo Model Viewer</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANo GLB Viewer</title>
+
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
 <style>
-body{margin:0;background:#050511;color:white;font-family:Arial,sans-serif;}
-header{text-align:center;padding:20px;border-bottom:2px solid #4f43ae;}
-h1{color:#38e8ff;}
-#viewer{width:100vw;height:90vh;}
+:root{
+    --cyan:#38E8FF;
+    --purple:#4F43AE;
+    --white:#F5F7FF;
+    --bg:#050511;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--white);
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+header{
+    text-align:center;
+    padding:30px;
+    border-bottom:3px solid var(--purple);
+}
+
+h1{
+    margin:0;
+    color:var(--cyan);
+    font-size:3rem;
+}
+
+.subtitle{
+    color:#cccccc;
+    margin-top:10px;
+}
+
+.viewer-container{
+    height:80vh;
+    width:100%;
+}
+
+model-viewer{
+    width:100%;
+    height:100%;
+    background:
+        radial-gradient(circle at center,
+        rgba(56,232,255,.15),
+        rgba(79,67,174,.10),
+        #050511);
+}
+
+.info{
+    max-width:1000px;
+    margin:auto;
+    padding:30px;
+}
+
+.card{
+    border:1px solid var(--purple);
+    border-radius:12px;
+    padding:20px;
+    background:#0a0a18;
+}
+
+.card h2{
+    color:var(--cyan);
+    margin-top:0;
+}
 </style>
 </head>
+
 <body>
+
 <header>
-<h1>SANo Development Model</h1>
-<p>Current shell prototype</p>
+    <h1>SANo Development Model</h1>
+    <div class="subtitle">
+        Place shell.glb in the same directory as this file.
+    </div>
 </header>
-<div id="viewer"></div>
 
-<script type="module">
-import * as THREE from "https://unpkg.com/three@0.164.1/build/three.module.js";
-import { OrbitControls } from "https://unpkg.com/three@0.164.1/examples/jsm/controls/OrbitControls.js";
-import { STLLoader } from "https://unpkg.com/three@0.164.1/examples/jsm/loaders/STLLoader.js";
+<div class="viewer-container">
+    <model-viewer
+        src="shell.glb"
+        alt="SANo Console Model"
+        camera-controls
+        auto-rotate
+        shadow-intensity="1"
+        exposure="1">
+    </model-viewer>
+</div>
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050511);
+<div class="info">
+    <div class="card">
+        <h2>Current Prototype</h2>
+        <p>
+            This viewer automatically loads <strong>shell.glb</strong>.
+            Replace the file with newer revisions while keeping the same filename
+            and the page will update automatically.
+        </p>
+    </div>
+</div>
 
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 10000);
-camera.position.set(0,100,250);
-
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.getElementById("viewer").appendChild(renderer.domElement);
-
-const controls = new OrbitControls(camera,renderer.domElement);
-controls.enableDamping = true;
-
-scene.add(new THREE.AmbientLight(0x404040,2));
-
-const light1 = new THREE.DirectionalLight(0x38e8ff,2);
-light1.position.set(100,100,100);
-scene.add(light1);
-
-const light2 = new THREE.DirectionalLight(0xffffff,1);
-light2.position.set(-100,50,-100);
-scene.add(light2);
-
-new STLLoader().load("shell.stl",(geometry)=>{
-    geometry.center();
-    const mesh = new THREE.Mesh(
-        geometry,
-        new THREE.MeshPhongMaterial({color:0x38e8ff,shininess:80})
-    );
-    scene.add(mesh);
-});
-
-function animate(){
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene,camera);
-}
-animate();
-
-window.addEventListener("resize",()=>{
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth,window.innerHeight);
-});
-</script>
 </body>
 </html>
