@@ -698,6 +698,40 @@
       }
     }
 
+
+    const controllerFolder = "./models/controller/";
+
+    async function loadController() {
+      loading.classList.add("show");
+      setStatus("Loading controller...");
+      await disposeCurrentModel();
+
+      try {
+        const manifest = await (await fetch(controllerFolder + "manifest.json")).json();
+
+        const results = await Promise.all(
+          manifest.parts.map(file =>
+            BABYLON.SceneLoader.ImportMeshAsync(null, controllerFolder, file, scene, undefined, ".glb")
+          )
+        );
+
+        loadedFileName = "controller";
+        loadedMeshes = results.flatMap(r => r.meshes.filter(m => m.name !== "__root__"));
+        currentRootNodes = results.flatMap(r => r.transformNodes.length ? r.transformNodes.filter(n=>!n.parent) : r.meshes.filter(m=>!m.parent));
+
+        loadedMeshes.forEach(m => m.isPickable = !!m.material);
+
+        frameModel(loadedMeshes);
+        emptyState.style.display = "none";
+        setStatus("Controller loaded","ready");
+      } catch(e) {
+        console.error(e);
+        setStatus("Failed to load controller","error");
+      } finally {
+        loading.classList.remove("show");
+      }
+    }
+
     async function loadHostedGlb(modelUrl, displayName = "controller.glb") {
       loading.classList.add("show");
       setStatus("Loading " + displayName + "…");
@@ -844,7 +878,7 @@
     exportColorsButton.addEventListener("click", saveProject);
     emailProjectButton.addEventListener("click", emailProject);
 
-    loadHostedGlb("./controller.glb", "controller.glb");
+    loadController();
 
     engine.runRenderLoop(() => scene.render());
     window.addEventListener("resize", () => engine.resize());
