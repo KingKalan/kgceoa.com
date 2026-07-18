@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>GLB Configurator</title>
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
@@ -26,6 +26,7 @@
       margin: 0;
       width: 100%;
       height: 100%;
+      height: 100dvh;
       overflow: hidden;
       background: var(--bg);
       color: var(--text);
@@ -326,24 +327,128 @@
 
     .loading.show { opacity: 1; }
 
-    @media (max-width: 760px) {
+    /*
+      Mobile/tablet layout:
+      The same page automatically switches from a left sidebar to a
+      scrollable bottom control panel. No redirect or separate HTML file
+      is required.
+    */
+    @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
       body {
-        display: block;
-      }
-
-      .sidebar {
-        position: absolute;
-        left: 12px;
-        top: 12px;
-        width: min(310px, calc(100% - 24px));
-        max-height: calc(100% - 24px);
-        border: 1px solid var(--panel-border);
-        border-radius: 18px;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(245px, 42dvh);
+        height: 100dvh;
+        overflow: hidden;
       }
 
       .viewer {
+        grid-column: 1;
+        grid-row: 1;
         width: 100%;
-        height: 100%;
+        min-width: 0;
+        min-height: 0;
+      }
+
+      .sidebar {
+        grid-column: 1;
+        grid-row: 2;
+        position: relative;
+        left: auto;
+        top: auto;
+        width: 100%;
+        max-height: none;
+        padding:
+          16px
+          max(16px, env(safe-area-inset-right))
+          max(18px, env(safe-area-inset-bottom))
+          max(16px, env(safe-area-inset-left));
+        border: 0;
+        border-top: 1px solid var(--panel-border);
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -16px 45px rgba(0,0,0,.4);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .brand {
+        margin-bottom: 14px;
+      }
+
+      .logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+      }
+
+      .subtitle {
+        display: none;
+      }
+
+      .section {
+        margin-top: 14px;
+        padding-top: 14px;
+      }
+
+      .value,
+      .theme-select,
+      .secondary-button,
+      .hex {
+        min-height: 44px;
+      }
+
+      .help {
+        right: 10px;
+        bottom: 10px;
+      }
+
+      .help span {
+        padding: 6px 8px;
+        font-size: 10px;
+      }
+
+      .loading {
+        top: 12px;
+      }
+
+      .empty-card {
+        max-width: min(420px, calc(100vw - 30px));
+        padding: 22px;
+      }
+
+      .empty-icon {
+        width: 58px;
+        height: 58px;
+        margin-bottom: 13px;
+      }
+
+      .empty-card h2 {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        grid-template-rows: minmax(0, 1fr) minmax(260px, 46dvh);
+      }
+
+      .sidebar {
+        padding-top: 13px;
+      }
+
+      .color-row {
+        grid-template-columns: 52px 1fr;
+        gap: 9px;
+      }
+
+      input[type="color"] {
+        width: 52px;
+        height: 44px;
+      }
+
+      .help span:nth-child(3) {
+        display: none;
       }
     }
   </style>
