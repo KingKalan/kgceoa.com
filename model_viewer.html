@@ -817,59 +817,301 @@
       --------------
       Add one new entry to CONTROLLER_THEMES.
 
-      A color may target:
-      1. A controller file group, such as "Body_front"
-      2. An exact mesh name inside a GLB
-      3. "*" as a fallback for every part
+      Themes are keyed by source GLB group and friendly part name, for example:
+        "A_B/A Button"
+
+      Each part stores its color, opaque/transparent material selection,
+      finish, and transparent tint strength.
 
       The theme menu is built automatically. No HTML changes are required.
     */
     const CONTROLLER_THEMES = {
-      original: {
-        label: "Original",
-        description: "Use the colors stored in the GLB files.",
-        colors: {}
-      },
-
-      midnight: {
-        label: "Midnight",
-        description: "Dark shell with subtle charcoal controls.",
-        colors: {
-          Body_front: "#17191F",
-          Body_back: "#0E1015",
-          A_B: "#30343D",
-          X_Y: "#30343D",
-          D_Pad: "#252830",
-          L_R: "#20232A",
-          Start_Select: "#4A4F5C"
+      "original": {
+        "label": "Original",
+        "description": "The original controller color scheme.",
+        "parts": {
+          "Body_front/Body Top": {
+            "color": "#5CD6FF",
+            "materialType": "opaque",
+            "finish": "satin",
+            "tintStrength": null
+          },
+          "Body_back/Body Back": {
+            "color": "#5CD6FF",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "A_B/A Button": {
+            "color": "#FF8800",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "A_B/B Button": {
+            "color": "#FF8800",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "X_Y/X Button": {
+            "color": "#FF8800",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "X_Y/Y Button": {
+            "color": "#FF8800",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Start_Select/Select": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "Start_Select/Start": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "D_Pad/DPad": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "matte",
+            "tintStrength": null
+          },
+          "L_R/Left Shoulder": {
+            "color": "#FF8800",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "L_R/Right Shoulder": {
+            "color": "#FF8800",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          }
         }
       },
-
-      arctic: {
-        label: "Arctic",
-        description: "Bright shell with cool gray controls.",
-        colors: {
-          Body_front: "#F2F4F7",
-          Body_back: "#D7DCE2",
-          A_B: "#FFFFFF",
-          X_Y: "#FFFFFF",
-          D_Pad: "#737B87",
-          L_R: "#C4CAD2",
-          Start_Select: "#737B87"
+      "midnight": {
+        "label": "Midnight",
+        "description": "A dark midnight color scheme with deep blue and violet accents.",
+        "parts": {
+          "A_B/B Button": {
+            "color": "#002024",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "A_B/A Button": {
+            "color": "#000619",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Body_back/Body Back": {
+            "color": "#000619",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Body_front/Body Top": {
+            "color": "#000619",
+            "materialType": "opaque",
+            "finish": "satin",
+            "tintStrength": null
+          },
+          "D_Pad/DPad": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "matte",
+            "tintStrength": null
+          },
+          "L_R/Right Shoulder": {
+            "color": "#130019",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "L_R/Left Shoulder": {
+            "color": "#130019",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Start_Select/Start": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "Start_Select/Select": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "X_Y/Y Button": {
+            "color": "#000619",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "X_Y/X Button": {
+            "color": "#16001F",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          }
         }
       },
-
-      violet: {
-        label: "Violet",
-        description: "Purple shell with dark contrasting controls.",
-        colors: {
-          Body_front: "#7657E8",
-          Body_back: "#4D35A8",
-          A_B: "#1B1D24",
-          X_Y: "#1B1D24",
-          D_Pad: "#262933",
-          L_R: "#352770",
-          Start_Select: "#D7CFFF"
+      "arcticFrost": {
+        "label": "Arctic Frost",
+        "description": "An icy blue and white controller color scheme.",
+        "parts": {
+          "A_B/B Button": {
+            "color": "#FFFFFF",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "A_B/A Button": {
+            "color": "#FFFFFF",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Body_back/Body Back": {
+            "color": "#6CA6FE",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Body_front/Body Top": {
+            "color": "#6CA6FE",
+            "materialType": "opaque",
+            "finish": "satin",
+            "tintStrength": null
+          },
+          "D_Pad/DPad": {
+            "color": "#737B87",
+            "materialType": "opaque",
+            "finish": "matte",
+            "tintStrength": null
+          },
+          "L_R/Right Shoulder": {
+            "color": "#C4CAD2",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "L_R/Left Shoulder": {
+            "color": "#C4CAD2",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Start_Select/Start": {
+            "color": "#737B87",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "Start_Select/Select": {
+            "color": "#737B87",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "X_Y/Y Button": {
+            "color": "#FFFFFF",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "X_Y/X Button": {
+            "color": "#FFFFFF",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          }
+        }
+      },
+      "aqua": {
+        "label": "Aqua",
+        "description": "A glossy aqua theme with transparent cyan shell pieces.",
+        "parts": {
+          "A_B/B Button": {
+            "color": "#00B7DB",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "A_B/A Button": {
+            "color": "#00B7DB",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Body_back/Body Back": {
+            "color": "#00B7DB",
+            "materialType": "transparent",
+            "finish": "glossy",
+            "tintStrength": 70
+          },
+          "Body_front/Body Top": {
+            "color": "#00B7DB",
+            "materialType": "transparent",
+            "finish": "glossy",
+            "tintStrength": 70
+          },
+          "D_Pad/DPad": {
+            "color": "#262933",
+            "materialType": "opaque",
+            "finish": "matte",
+            "tintStrength": null
+          },
+          "L_R/Right Shoulder": {
+            "color": "#00B7DB",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "L_R/Left Shoulder": {
+            "color": "#00B7DB",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "Start_Select/Start": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "Start_Select/Select": {
+            "color": "#1A1A1A",
+            "materialType": "opaque",
+            "finish": "softTouch",
+            "tintStrength": null
+          },
+          "X_Y/Y Button": {
+            "color": "#00B7DB",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          },
+          "X_Y/X Button": {
+            "color": "#00B7DB",
+            "materialType": "opaque",
+            "finish": "gloss",
+            "tintStrength": null
+          }
         }
       }
     };
@@ -1079,16 +1321,46 @@
       );
     }
 
-    function resolveThemeColor(theme, mesh) {
-      const colors = theme?.colors || {};
-      const groupName = mesh?.metadata?.controllerPart;
-      const exactMeshName = mesh?.name;
+    function resolveThemePart(theme, mesh) {
+      const parts = theme?.parts || {};
+      const sourcePart = mesh?.metadata?.controllerPart || "";
+      const displayName = getPartDisplayName(mesh);
+      const exactKey = sourcePart + "/" + displayName;
 
       return (
-        colors[exactMeshName] ||
-        colors[groupName] ||
-        colors["*"] ||
+        parts[exactKey] ||
+        parts[sourcePart + "/*"] ||
+        parts["*/" + displayName] ||
+        parts["*"] ||
         null
+      );
+    }
+
+    function applyThemePart(mesh, themePart) {
+      if (!mesh?.material || !themePart) return;
+
+      const material = ensureConfigurableMaterial(mesh);
+      if (!mesh.metadata) mesh.metadata = {};
+
+      mesh.metadata.materialMode = themePart.materialType || "opaque";
+      mesh.metadata.finishName = themePart.finish ||
+        (mesh.metadata.materialMode === "transparent" ? "glossy" : "satin");
+      mesh.metadata.tintStrength = themePart.tintStrength == null
+        ? 50
+        : Number(themePart.tintStrength);
+
+      if (themePart.color) {
+        setMaterialColor(
+          material,
+          BABYLON.Color3.FromHexString(themePart.color)
+        );
+      }
+
+      applyMaterialPresentation(mesh);
+      recordColorSelection(
+        mesh,
+        material,
+        themePart.color || colorToHex(getMaterialColor(material))
       );
     }
 
@@ -1104,18 +1376,11 @@
       loadedMeshes.forEach(mesh => {
         if (!mesh.material) return;
 
-        if (themeName === "original") {
-          restoreOriginalMeshColor(mesh);
+        const themePart = resolveThemePart(theme, mesh);
+        if (themePart) {
+          applyThemePart(mesh, themePart);
         } else {
-          const hex = resolveThemeColor(theme, mesh);
-          if (!hex) {
-            restoreOriginalMeshColor(mesh);
-            return;
-          }
-
-          const material = ensureConfigurableMaterial(mesh);
-          setMaterialColor(material, BABYLON.Color3.FromHexString(hex));
-          recordColorSelection(mesh, material, hex);
+          restoreOriginalMeshColor(mesh);
         }
       });
 
