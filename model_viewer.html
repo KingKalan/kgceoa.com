@@ -755,19 +755,46 @@
     camera.panningSensibility = 1100;
     camera.inertia = 0.78;
 
+    /*
+      HDRI / IMAGE-BASED LIGHTING
+      ---------------------------
+      The HDR environment lights and reflects in the controller materials,
+      but it is NOT rendered as the visible background. The existing page
+      background/world space remains unchanged.
+
+      To use your own environment later:
+      1. Put a Babylon .env file in: ./environment/studio.env
+      2. Change HDRI_URL below to: "./environment/studio.env"
+
+      Babylon .env files are preferred for fast, prefiltered PBR lighting.
+    */
+    const HDRI_URL =
+      "https://assets.babylonjs.com/environments/environmentSpecular.env";
+
+    const environmentTexture =
+      BABYLON.CubeTexture.CreateFromPrefilteredData(HDRI_URL, scene);
+
+    environmentTexture.name = "Configurator HDRI";
+    environmentTexture.gammaSpace = false;
+    scene.environmentTexture = environmentTexture;
+    scene.environmentIntensity = 0.85;
+
+    // No skybox is created. The HDRI is therefore used only for lighting
+    // and reflections while scene.clearColor stays transparent.
+    scene.imageProcessingConfiguration.exposure = 1.05;
+    scene.imageProcessingConfiguration.contrast = 1.08;
+    scene.imageProcessingConfiguration.toneMappingEnabled = true;
+    scene.imageProcessingConfiguration.toneMappingType =
+      BABYLON.ImageProcessingConfiguration.TONEMAPPING_ACES;
+
+    // Very soft fallback illumination prevents a black model if the
+    // external environment texture cannot load.
     const hemispheric = new BABYLON.HemisphericLight(
-      "hemispheric",
+      "fallbackLight",
       new BABYLON.Vector3(0.2, 1, 0.3),
       scene
     );
-    hemispheric.intensity = 1.05;
-
-    const fill = new BABYLON.DirectionalLight(
-      "fill",
-      new BABYLON.Vector3(-0.5, -1, 0.4),
-      scene
-    );
-    fill.intensity = 0.65;
+    hemispheric.intensity = 0.18;
 
     const highlight = new BABYLON.HighlightLayer("selectionHighlight", scene);
     highlight.innerGlow = false;
