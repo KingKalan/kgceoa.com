@@ -205,6 +205,107 @@
 
     .hex:focus { border-color: rgba(124,92,255,.8); }
 
+    .palette-help {
+      margin: -2px 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .part-palette {
+      display: grid;
+      gap: 8px;
+    }
+
+    .palette-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 42px 88px;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .palette-row.selected {
+      border-color: rgba(124,92,255,.85);
+      background: rgba(124,92,255,.10);
+    }
+
+    .palette-part-button {
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .palette-part-name,
+    .palette-part-group {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .palette-part-group {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .palette-color {
+      width: 42px;
+      height: 38px;
+      padding: 3px;
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      background: rgba(255,255,255,.05);
+      cursor: pointer;
+    }
+
+    .palette-hex {
+      width: 88px;
+      height: 38px;
+      padding: 0 8px;
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      background: rgba(255,255,255,.035);
+      color: var(--text);
+      font: inherit;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .recent-label { margin-top: 16px; }
+
+    .recent-colors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .recent-swatch {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 2px solid rgba(255,255,255,.35);
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.22);
+    }
+
+    .palette-empty {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .status {
       display: flex;
       align-items: center;
@@ -428,6 +529,17 @@
       }
     }
 
+    @media (max-width: 420px) {
+      .palette-row {
+        grid-template-columns: minmax(0, 1fr) 40px 80px;
+        gap: 6px;
+        padding: 7px;
+      }
+
+      .palette-color { width: 40px; }
+      .palette-hex { width: 80px; padding: 0 6px; }
+    }
+
     @media (max-width: 520px) {
       body {
         grid-template-rows: minmax(0, 1fr) minmax(260px, 46dvh);
@@ -484,12 +596,29 @@
     </div>
 
     <div class="section">
-      <span class="label">Color</span>
+      <span class="label">Selected Part Color</span>
       <div class="color-row">
         <input id="colorPicker" type="color" value="#7c5cff" disabled />
         <input id="hexInput" class="hex" type="text" value="#7C5CFF" maxlength="7" disabled />
       </div>
       <button id="resetPart" class="secondary-button" disabled>Reset Selected Part</button>
+    </div>
+
+    <div class="section">
+      <span class="label">All Part Colors</span>
+      <div class="palette-help">
+        Select a row to highlight that part. All assigned colors stay visible,
+        making it easy to reuse a color with the eyedropper.
+      </div>
+      <div id="partPalette" class="part-palette"></div>
+
+      <span class="label recent-label">Recent Colors</span>
+      <div id="recentColors" class="recent-colors">
+        <span class="palette-empty">Colors you use will appear here.</span>
+      </div>
+    </div>
+
+    <div class="section">
       <button id="resetView" class="secondary-button">Reset Camera</button>
       <button id="exportColors" class="secondary-button" disabled>Save Project</button>
       <button id="emailProject" class="secondary-button" disabled>Email Project</button>
@@ -528,6 +657,8 @@
     const themeSelect = document.getElementById("themeSelect");
     const themeDescription = document.getElementById("themeDescription");
     const resetPartButton = document.getElementById("resetPart");
+    const partPalette = document.getElementById("partPalette");
+    const recentColors = document.getElementById("recentColors");
     const resetViewButton = document.getElementById("resetView");
     const exportColorsButton = document.getElementById("exportColors");
     const emailProjectButton = document.getElementById("emailProject");
@@ -592,6 +723,8 @@
     let defaultCameraState = null;
     let loadedFileName = "";
     const colorSelections = new Map();
+    const recentColorValues = [];
+    const paletteRows = new Map();
 
     /*
       ADDING A THEME
@@ -752,6 +885,7 @@
 
       exportColorsButton.disabled = colorSelections.size === 0;
       emailProjectButton.disabled = colorSelections.size === 0;
+      refreshPartPalette();
       setStatus((theme.label || themeName) + " theme applied", "ready");
     }
 
@@ -787,14 +921,29 @@
       return group + "/" + meshName;
     }
 
+    function cleanMeshName(name) {
+      return String(name || "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
     function getPartDisplayName(mesh) {
-      const groupName = mesh?.metadata?.controllerPart;
+      const meshName = mesh?.name || "";
+      const groupName = mesh?.metadata?.controllerPart || "";
+
       return (
+        MESH_DISPLAY_NAMES[meshName] ||
+        cleanMeshName(meshName) ||
         PART_DISPLAY_NAMES[groupName] ||
         groupName ||
-        mesh?.name ||
         "Unnamed part"
       );
+    }
+
+    function getGroupDisplayName(mesh) {
+      const groupName = mesh?.metadata?.controllerPart || "";
+      return PART_DISPLAY_NAMES[groupName] || groupName || "Controller";
     }
 
     function recordColorSelection(mesh, material, hexColor) {
@@ -811,6 +960,139 @@
 
       exportColorsButton.disabled = colorSelections.size === 0;
       emailProjectButton.disabled = colorSelections.size === 0;
+    }
+
+
+    function addRecentColor(hexColor) {
+      const hex = hexColor.toUpperCase();
+      const index = recentColorValues.indexOf(hex);
+      if (index !== -1) recentColorValues.splice(index, 1);
+      recentColorValues.unshift(hex);
+      recentColorValues.splice(12);
+      renderRecentColors();
+    }
+
+    function renderRecentColors() {
+      recentColors.innerHTML = "";
+
+      if (!recentColorValues.length) {
+        const empty = document.createElement("span");
+        empty.className = "palette-empty";
+        empty.textContent = "Colors you use will appear here.";
+        recentColors.appendChild(empty);
+        return;
+      }
+
+      recentColorValues.forEach(hex => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "recent-swatch";
+        button.style.background = hex;
+        button.title = "Apply " + hex + " to the selected part";
+        button.addEventListener("click", () => {
+          if (selectedMesh) applyColorToMesh(selectedMesh, hex, true);
+        });
+        recentColors.appendChild(button);
+      });
+    }
+
+    function applyColorToMesh(mesh, hexColor, remember = true) {
+      if (!mesh?.material) return;
+
+      const material = ensureConfigurableMaterial(mesh);
+      const hex = hexColor.toUpperCase();
+
+      setMaterialColor(material, BABYLON.Color3.FromHexString(hex));
+      recordColorSelection(mesh, material, hex);
+
+      if (remember) addRecentColor(hex);
+
+      if (selectedMesh === mesh) {
+        selectedMaterial = material;
+        colorPicker.value = hex;
+        hexInput.value = hex;
+      }
+
+      updatePaletteRow(mesh);
+    }
+
+    function updatePaletteRow(mesh) {
+      const data = paletteRows.get(mesh.uniqueId);
+      if (!data) return;
+
+      const hex = colorToHex(getMaterialColor(mesh.material));
+      data.color.value = hex;
+      data.hex.value = hex;
+      data.row.classList.toggle("selected", selectedMesh === mesh);
+    }
+
+    function refreshPartPalette() {
+      paletteRows.clear();
+      partPalette.innerHTML = "";
+
+      const meshes = loadedMeshes
+        .filter(mesh => mesh && mesh.material && mesh.isVisible !== false && mesh.name !== "__root__")
+        .sort((a, b) =>
+          getGroupDisplayName(a).localeCompare(getGroupDisplayName(b)) ||
+          getPartDisplayName(a).localeCompare(getPartDisplayName(b))
+        );
+
+      meshes.forEach(mesh => {
+        const row = document.createElement("div");
+        row.className = "palette-row";
+
+        const selectButton = document.createElement("button");
+        selectButton.type = "button";
+        selectButton.className = "palette-part-button";
+
+        const name = document.createElement("span");
+        name.className = "palette-part-name";
+        name.textContent = getPartDisplayName(mesh);
+
+        const group = document.createElement("span");
+        group.className = "palette-part-group";
+        group.textContent = getGroupDisplayName(mesh);
+
+        selectButton.append(name, group);
+        selectButton.addEventListener("click", () => selectMesh(mesh));
+
+        const color = document.createElement("input");
+        color.type = "color";
+        color.className = "palette-color";
+        color.setAttribute("aria-label", "Color for " + getPartDisplayName(mesh));
+
+        const hex = document.createElement("input");
+        hex.type = "text";
+        hex.className = "palette-hex";
+        hex.maxLength = 7;
+        hex.setAttribute("aria-label", "Hex color for " + getPartDisplayName(mesh));
+
+        const currentHex = colorToHex(getMaterialColor(mesh.material));
+        color.value = currentHex;
+        hex.value = currentHex;
+
+        color.addEventListener("input", event => {
+          applyColorToMesh(mesh, event.target.value, true);
+        });
+
+        hex.addEventListener("change", event => {
+          let value = event.target.value.trim();
+          if (!value.startsWith("#")) value = "#" + value;
+
+          if (!/^#[0-9A-Fa-f]{6}$/.test(value)) {
+            updatePaletteRow(mesh);
+            return;
+          }
+
+          applyColorToMesh(mesh, value, true);
+        });
+
+        row.append(selectButton, color, hex);
+        partPalette.appendChild(row);
+        paletteRows.set(mesh.uniqueId, { row, color, hex });
+      });
+
+      meshes.forEach(updatePaletteRow);
     }
 
     function buildProjectData() {
@@ -915,6 +1197,7 @@
       colorPicker.disabled = true;
       hexInput.disabled = true;
       resetPartButton.disabled = true;
+      paletteRows.forEach(({ row }) => row.classList.remove("selected"));
     }
 
     function selectMesh(mesh) {
@@ -940,6 +1223,9 @@
       colorPicker.disabled = false;
       hexInput.disabled = false;
       resetPartButton.disabled = !selectedOriginalColor;
+      paletteRows.forEach(({ row }) => row.classList.remove("selected"));
+      const rowData = paletteRows.get(mesh.uniqueId);
+      if (rowData) rowData.row.classList.add("selected");
     }
 
     function frameModel(meshes) {
@@ -1029,6 +1315,17 @@
       L_R: "Shoulder Buttons",
       Start_Select: "Start / Select",
       X_Y: "X / Y Buttons"
+    };
+
+    /*
+      Optional exact mesh-name overrides.
+      Change or add names here when individual meshes need friendlier labels.
+    */
+    const MESH_DISPLAY_NAMES = {
+      A: "A Button",
+      B: "B Button",
+      X: "X Button",
+      Y: "Y Button"
     };
 
     async function loadController() {
@@ -1191,9 +1488,7 @@
       if (!selectedMaterial) return;
 
       const value = event.target.value.toUpperCase();
-      hexInput.value = value;
-      setMaterialColor(selectedMaterial, BABYLON.Color3.FromHexString(value));
-      recordColorSelection(selectedMesh, selectedMaterial, value);
+      applyColorToMesh(selectedMesh, value, true);
     });
 
     hexInput.addEventListener("change", event => {
@@ -1209,9 +1504,7 @@
 
       value = value.toUpperCase();
       event.target.value = value;
-      colorPicker.value = value;
-      setMaterialColor(selectedMaterial, BABYLON.Color3.FromHexString(value));
-      recordColorSelection(selectedMesh, selectedMaterial, value);
+      applyColorToMesh(selectedMesh, value, true);
     });
 
     resetPartButton.addEventListener("click", () => {
@@ -1222,6 +1515,8 @@
       colorPicker.value = hex;
       hexInput.value = hex;
       recordColorSelection(selectedMesh, selectedMaterial, hex);
+      addRecentColor(hex);
+      updatePaletteRow(selectedMesh);
     });
 
     resetViewButton.addEventListener("click", () => {
