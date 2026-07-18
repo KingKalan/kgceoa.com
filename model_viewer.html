@@ -700,6 +700,15 @@
 
 
     const controllerFolder = "./models/controller/";
+    const controllerParts = [
+      "A_B.glb",
+      "Body_back.glb",
+      "Body_front.glb",
+      "D_Pad.glb",
+      "L_R.glb",
+      "Start_Select.glb",
+      "X_Y.glb"
+    ];
 
     async function loadController() {
       loading.classList.add("show");
@@ -707,26 +716,44 @@
       await disposeCurrentModel();
 
       try {
-        const manifest = await (await fetch(controllerFolder + "manifest.json")).json();
-
         const results = await Promise.all(
-          manifest.parts.map(file =>
-            BABYLON.SceneLoader.ImportMeshAsync(null, controllerFolder, file, scene, undefined, ".glb")
+          controllerParts.map(file =>
+            BABYLON.SceneLoader.ImportMeshAsync(
+              null,
+              controllerFolder,
+              file,
+              scene,
+              undefined,
+              ".glb"
+            )
           )
         );
 
         loadedFileName = "controller";
-        loadedMeshes = results.flatMap(r => r.meshes.filter(m => m.name !== "__root__"));
-        currentRootNodes = results.flatMap(r => r.transformNodes.length ? r.transformNodes.filter(n=>!n.parent) : r.meshes.filter(m=>!m.parent));
+        loadedMeshes = results.flatMap(result =>
+          result.meshes.filter(mesh => mesh.name !== "__root__")
+        );
 
-        loadedMeshes.forEach(m => m.isPickable = !!m.material);
+        currentRootNodes = results.flatMap(result =>
+          result.transformNodes.length
+            ? result.transformNodes.filter(node => !node.parent)
+            : result.meshes.filter(mesh => !mesh.parent)
+        );
+
+        loadedMeshes.forEach(mesh => {
+          mesh.isPickable = Boolean(mesh.material);
+        });
 
         frameModel(loadedMeshes);
         emptyState.style.display = "none";
-        setStatus("Controller loaded","ready");
-      } catch(e) {
-        console.error(e);
-        setStatus("Failed to load controller","error");
+        setStatus("Controller loaded", "ready");
+      } catch (error) {
+        console.error(error);
+        setStatus("Failed to load controller", "error");
+        emptyState.style.display = "grid";
+        emptyState.querySelector("h2").textContent = "Controller failed to load";
+        emptyState.querySelector("p").textContent =
+          "Make sure all seven GLB files are inside /models/controller/ and their capitalization matches exactly.";
       } finally {
         loading.classList.remove("show");
       }
