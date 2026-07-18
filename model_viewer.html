@@ -150,6 +150,29 @@
 
     input[type="file"] { display: none; }
 
+    .theme-select {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .theme-select:focus {
+      border-color: rgba(124,92,255,.8);
+    }
+
+    .theme-select option {
+      background: #1b1e25;
+      color: var(--text);
+    }
+
     .color-row {
       display: grid;
       grid-template-columns: 58px 1fr;
@@ -351,8 +374,12 @@
     </div>
 
     <div class="section">
-      <span class="label">Material</span>
-      <div id="materialName" class="value">—</div>
+      <label class="label" for="themeSelect">Theme</label>
+      <select id="themeSelect" class="theme-select"></select>
+      <div class="status">
+        <span class="status-dot ready"></span>
+        <span id="themeDescription">Choose a starting color theme, then customize any part.</span>
+      </div>
     </div>
 
     <div class="section">
@@ -397,7 +424,8 @@
     const colorPicker = document.getElementById("colorPicker");
     const hexInput = document.getElementById("hexInput");
     const partName = document.getElementById("partName");
-    const materialName = document.getElementById("materialName");
+    const themeSelect = document.getElementById("themeSelect");
+    const themeDescription = document.getElementById("themeDescription");
     const resetPartButton = document.getElementById("resetPart");
     const resetViewButton = document.getElementById("resetView");
     const exportColorsButton = document.getElementById("exportColors");
@@ -459,6 +487,169 @@
     let loadedFileName = "";
     const colorSelections = new Map();
 
+    /*
+      ADDING A THEME
+      --------------
+      Add one new entry to CONTROLLER_THEMES.
+
+      A color may target:
+      1. A controller file group, such as "Body_front"
+      2. An exact mesh name inside a GLB
+      3. "*" as a fallback for every part
+
+      The theme menu is built automatically. No HTML changes are required.
+    */
+    const CONTROLLER_THEMES = {
+      original: {
+        label: "Original",
+        description: "Use the colors stored in the GLB files.",
+        colors: {}
+      },
+
+      midnight: {
+        label: "Midnight",
+        description: "Dark shell with subtle charcoal controls.",
+        colors: {
+          Body_front: "#17191F",
+          Body_back: "#0E1015",
+          A_B: "#30343D",
+          X_Y: "#30343D",
+          D_Pad: "#252830",
+          L_R: "#20232A",
+          Start_Select: "#4A4F5C"
+        }
+      },
+
+      arctic: {
+        label: "Arctic",
+        description: "Bright shell with cool gray controls.",
+        colors: {
+          Body_front: "#F2F4F7",
+          Body_back: "#D7DCE2",
+          A_B: "#FFFFFF",
+          X_Y: "#FFFFFF",
+          D_Pad: "#737B87",
+          L_R: "#C4CAD2",
+          Start_Select: "#737B87"
+        }
+      },
+
+      violet: {
+        label: "Violet",
+        description: "Purple shell with dark contrasting controls.",
+        colors: {
+          Body_front: "#7657E8",
+          Body_back: "#4D35A8",
+          A_B: "#1B1D24",
+          X_Y: "#1B1D24",
+          D_Pad: "#262933",
+          L_R: "#352770",
+          Start_Select: "#D7CFFF"
+        }
+      }
+    };
+
+    let activeThemeName = "original";
+
+    function initializeThemeSelector() {
+      themeSelect.innerHTML = "";
+
+      Object.entries(CONTROLLER_THEMES).forEach(([themeName, theme]) => {
+        const option = document.createElement("option");
+        option.value = themeName;
+        option.textContent = theme.label || themeName;
+        themeSelect.appendChild(option);
+      });
+
+      themeSelect.value = activeThemeName;
+      updateThemeDescription(activeThemeName);
+    }
+
+    function updateThemeDescription(themeName) {
+      const theme = CONTROLLER_THEMES[themeName];
+      themeDescription.textContent =
+        theme?.description || "Choose a starting theme, then customize any part.";
+    }
+
+    function ensureConfigurableMaterial(mesh) {
+      if (!mesh?.material) return null;
+      if (!mesh.metadata) mesh.metadata = {};
+
+      if (!mesh.metadata.originalConfiguratorColor) {
+        const originalColor = getMaterialColor(mesh.material);
+        mesh.metadata.originalConfiguratorColor = originalColor
+          ? { r: originalColor.r, g: originalColor.g, b: originalColor.b }
+          : null;
+      }
+
+      if (!mesh.metadata.configuratorMaterialCloned) {
+        mesh.material = mesh.material.clone(
+          (mesh.material.name || "material") + "_configurator_" + mesh.uniqueId
+        );
+        mesh.metadata.configuratorMaterialCloned = true;
+      }
+
+      return mesh.material;
+    }
+
+    function restoreOriginalMeshColor(mesh) {
+      const material = ensureConfigurableMaterial(mesh);
+      const saved = mesh?.metadata?.originalConfiguratorColor;
+
+      if (!material || !saved) return;
+
+      setMaterialColor(
+        material,
+        new BABYLON.Color3(saved.r, saved.g, saved.b)
+      );
+    }
+
+    function resolveThemeColor(theme, mesh) {
+      const colors = theme?.colors || {};
+      const groupName = mesh?.metadata?.controllerPart;
+      const exactMeshName = mesh?.name;
+
+      return (
+        colors[exactMeshName] ||
+        colors[groupName] ||
+        colors["*"] ||
+        null
+      );
+    }
+
+    function applyTheme(themeName) {
+      const theme = CONTROLLER_THEMES[themeName];
+      if (!theme || !loadedMeshes.length) return;
+
+      activeThemeName = themeName;
+      updateThemeDescription(themeName);
+      clearSelection();
+      colorSelections.clear();
+
+      loadedMeshes.forEach(mesh => {
+        if (!mesh.material) return;
+
+        if (themeName === "original") {
+          restoreOriginalMeshColor(mesh);
+        } else {
+          const hex = resolveThemeColor(theme, mesh);
+          if (!hex) {
+            restoreOriginalMeshColor(mesh);
+            return;
+          }
+
+          const material = ensureConfigurableMaterial(mesh);
+          setMaterialColor(material, BABYLON.Color3.FromHexString(hex));
+          recordColorSelection(mesh, material, hex);
+        }
+      });
+
+      exportColorsButton.disabled = colorSelections.size === 0;
+      emailProjectButton.disabled = colorSelections.size === 0;
+      setStatus((theme.label || themeName) + " theme applied", "ready");
+    }
+
+
     function setStatus(message, type = "neutral") {
       statusText.textContent = message;
       statusDot.className = "status-dot";
@@ -485,7 +676,13 @@
     }
 
     function getPartKey(mesh) {
-      return String(mesh?.name || "Unnamed part");
+      const group = mesh?.metadata?.controllerPart || "Controller";
+      const meshName = mesh?.name || "Unnamed part";
+      return group + "/" + meshName;
+    }
+
+    function getPartDisplayName(mesh) {
+      return mesh?.metadata?.controllerPart || mesh?.name || "Unnamed part";
     }
 
     function recordColorSelection(mesh, material, hexColor) {
@@ -601,7 +798,6 @@
       selectedMaterial = null;
       selectedOriginalColor = null;
       partName.textContent = "Nothing selected";
-      materialName.textContent = "—";
       colorPicker.disabled = true;
       hexInput.disabled = true;
       resetPartButton.disabled = true;
@@ -614,21 +810,13 @@
 
       selectedMesh = mesh;
 
-      // Clone the material once so recoloring this mesh does not necessarily
-      // recolor other parts that share the same original material.
-      if (!mesh.metadata) mesh.metadata = {};
-      if (!mesh.metadata.configuratorMaterialCloned) {
-        mesh.material = mesh.material.clone(mesh.material.name + "_configurator_" + mesh.uniqueId);
-        mesh.metadata.configuratorMaterialCloned = true;
-      }
-
-      selectedMaterial = mesh.material;
+      selectedMaterial = ensureConfigurableMaterial(mesh);
+      if (!selectedMaterial) return;
       selectedOriginalColor = getMaterialColor(selectedMaterial);
 
       highlight.addMesh(mesh, new BABYLON.Color3(0.49, 0.36, 1.0));
 
-      partName.textContent = mesh.name || "Unnamed part";
-      materialName.textContent = selectedMaterial.name || "Unnamed material";
+      partName.textContent = getPartDisplayName(mesh);
 
       const currentColor = getMaterialColor(selectedMaterial) || BABYLON.Color3.FromHexString("#7C5CFF");
       const hex = colorToHex(currentColor);
@@ -717,16 +905,25 @@
 
       try {
         const results = await Promise.all(
-          controllerParts.map(file =>
-            BABYLON.SceneLoader.ImportMeshAsync(
+          controllerParts.map(async file => {
+            const result = await BABYLON.SceneLoader.ImportMeshAsync(
               null,
               controllerFolder,
               file,
               scene,
               undefined,
               ".glb"
-            )
-          )
+            );
+
+            const controllerPart = file.replace(/\.glb$/i, "");
+            result.meshes.forEach(mesh => {
+              if (mesh.name === "__root__") return;
+              if (!mesh.metadata) mesh.metadata = {};
+              mesh.metadata.controllerPart = controllerPart;
+            });
+
+            return result;
+          })
         );
 
         loadedFileName = "controller";
@@ -746,6 +943,7 @@
 
         frameModel(loadedMeshes);
         emptyState.style.display = "none";
+        applyTheme(activeThemeName);
         setStatus("Controller loaded", "ready");
       } catch (error) {
         console.error(error);
@@ -902,9 +1100,14 @@
       camera.setTarget(defaultCameraState.target);
     });
 
+    themeSelect.addEventListener("change", event => {
+      applyTheme(event.target.value);
+    });
+
     exportColorsButton.addEventListener("click", saveProject);
     emailProjectButton.addEventListener("click", emailProject);
 
+    initializeThemeSelector();
     loadController();
 
     engine.runRenderLoop(() => scene.render());
