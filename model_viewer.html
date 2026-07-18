@@ -205,6 +205,42 @@
 
     .hex:focus { border-color: rgba(124,92,255,.8); }
 
+    .control-label { margin-top: 14px; }
+
+    .range-control { margin-top: 14px; }
+
+    .range-heading,
+    .range-scale {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .range-heading {
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .range-scale {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #7c5cff;
+      cursor: pointer;
+    }
+
+    input[type="range"]:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+    }
+
     .palette-help {
       margin: -2px 0 12px;
       color: var(--muted);
@@ -596,6 +632,29 @@
     </div>
 
     <div class="section">
+      <label class="label" for="materialType">Material</label>
+      <select id="materialType" class="theme-select" disabled>
+        <option value="opaque">Opaque</option>
+        <option value="transparent">Transparent</option>
+      </select>
+
+      <label class="label control-label" for="finishSelect">Finish</label>
+      <select id="finishSelect" class="theme-select" disabled></select>
+
+      <div id="tintStrengthWrap" class="range-control" hidden>
+        <div class="range-heading">
+          <label for="tintStrength">Tint Strength</label>
+          <span id="tintStrengthValue">50%</span>
+        </div>
+        <input id="tintStrength" type="range" min="5" max="95" step="1" value="50" disabled />
+        <div class="range-scale">
+          <span>Light tint</span>
+          <span>Deep tint</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
       <span class="label">Selected Part Color</span>
       <div class="color-row">
         <input id="colorPicker" type="color" value="#7c5cff" disabled />
@@ -790,6 +849,151 @@
 
     let activeThemeName = "original";
 
+    const OPAQUE_FINISHES = {
+      gloss: { label: "Gloss", roughness: 0.15 },
+      satin: { label: "Satin", roughness: 0.35 },
+      matte: { label: "Matte", roughness: 0.60 },
+      softTouch: { label: "Soft Touch", roughness: 0.80 }
+    };
+
+    const TRANSPARENT_FINISHES = {
+      glossy: { label: "Glossy", roughness: 0.08 }
+    };
+
+    function getMaterialMode(mesh) {
+      return mesh?.metadata?.materialMode || "opaque";
+    }
+
+    function getFinishName(mesh) {
+      return mesh?.metadata?.finishName ||
+        (getMaterialMode(mesh) === "transparent" ? "glossy" : "satin");
+    }
+
+    function getTintStrength(mesh) {
+      return Number(mesh?.metadata?.tintStrength ?? 50);
+    }
+
+    function populateFinishSelector(mode, selectedFinish) {
+      const finishes = mode === "transparent"
+        ? TRANSPARENT_FINISHES
+        : OPAQUE_FINISHES;
+
+      finishSelect.innerHTML = "";
+
+      Object.entries(finishes).forEach(([key, finish]) => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = finish.label;
+        finishSelect.appendChild(option);
+      });
+
+      finishSelect.value = finishes[selectedFinish]
+        ? selectedFinish
+        : Object.keys(finishes)[0];
+    }
+
+    function applyMaterialPresentation(mesh) {
+      if (!mesh?.material) return;
+
+      const material = mesh.material;
+      const mode = getMaterialMode(mesh);
+      const finishName = getFinishName(mesh);
+
+      if (mode === "transparent") {
+        const finish = TRANSPARENT_FINISHES[finishName] || TRANSPARENT_FINISHES.glossy;
+        const strength = getTintStrength(mesh);
+
+        material.roughness = finish.roughness;
+        material.metallic = 0;
+        material.alpha = Math.max(0.08, Math.min(0.95, strength / 100));
+        material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHABLEND;
+        material.needDepthPrePass = true;
+        material.backFaceCulling = false;
+        material.separateCullingPass = true;
+      } else {
+        const finish = OPAQUE_FINISHES[finishName] || OPAQUE_FINISHES.satin;
+
+        material.roughness = finish.roughness;
+        material.metallic = 0;
+        material.alpha = 1;
+        material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_OPAQUE;
+        material.needDepthPrePass = false;
+        material.backFaceCulling = true;
+        material.separateCullingPass = false;
+      }
+
+      material.markAsDirty(BABYLON.Material.AllDirtyFlag);
+    }
+
+    function updateMaterialControls(mesh) {
+      const enabled = Boolean(mesh?.material);
+
+      materialType.disabled = !enabled;
+      finishSelect.disabled = !enabled;
+      tintStrength.disabled = !enabled;
+
+      if (!enabled) {
+        finishSelect.innerHTML = "";
+        tintStrengthWrap.hidden = true;
+        return;
+      }
+
+      const mode = getMaterialMode(mesh);
+      const finishName = getFinishName(mesh);
+      const strength = getTintStrength(mesh);
+
+      materialType.value = mode;
+      populateFinishSelector(mode, finishName);
+      tintStrengthWrap.hidden = mode !== "transparent";
+      tintStrength.value = String(strength);
+      tintStrengthValue.textContent = strength + "%";
+    }
+
+    function setSelectedMaterialMode(mode) {
+      if (!selectedMesh) return;
+      if (!selectedMesh.metadata) selectedMesh.metadata = {};
+
+      selectedMesh.metadata.materialMode = mode;
+      selectedMesh.metadata.finishName =
+        mode === "transparent" ? "glossy" : "satin";
+
+      if (selectedMesh.metadata.tintStrength == null) {
+        selectedMesh.metadata.tintStrength = 50;
+      }
+
+      applyMaterialPresentation(selectedMesh);
+      updateMaterialControls(selectedMesh);
+      recordColorSelection(
+        selectedMesh,
+        selectedMesh.material,
+        colorToHex(getMaterialColor(selectedMesh.material))
+      );
+    }
+
+    function setSelectedFinish(finishName) {
+      if (!selectedMesh) return;
+      selectedMesh.metadata.finishName = finishName;
+      applyMaterialPresentation(selectedMesh);
+      updateMaterialControls(selectedMesh);
+      recordColorSelection(
+        selectedMesh,
+        selectedMesh.material,
+        colorToHex(getMaterialColor(selectedMesh.material))
+      );
+    }
+
+    function setSelectedTintStrength(value) {
+      if (!selectedMesh) return;
+      selectedMesh.metadata.tintStrength = Number(value);
+      tintStrengthValue.textContent = value + "%";
+      applyMaterialPresentation(selectedMesh);
+      recordColorSelection(
+        selectedMesh,
+        selectedMesh.material,
+        colorToHex(getMaterialColor(selectedMesh.material))
+      );
+    }
+
     function initializeThemeSelector() {
       themeSelect.innerHTML = "";
 
@@ -828,6 +1032,11 @@
         mesh.metadata.configuratorMaterialCloned = true;
       }
 
+      if (!mesh.metadata.materialMode) mesh.metadata.materialMode = "opaque";
+      if (!mesh.metadata.finishName) mesh.metadata.finishName = "satin";
+      if (mesh.metadata.tintStrength == null) mesh.metadata.tintStrength = 50;
+
+      applyMaterialPresentation(mesh);
       return mesh.material;
     }
 
@@ -955,7 +1164,12 @@
         partName: getPartDisplayName(mesh),
         sourcePart: mesh?.metadata?.controllerPart || mesh?.name || "Unnamed part",
         materialName: material.name || "Unnamed material",
-        colorHex: hexColor.toUpperCase()
+        colorHex: hexColor.toUpperCase(),
+        materialType: getMaterialMode(mesh),
+        finish: getFinishName(mesh),
+        tintStrength: getMaterialMode(mesh) === "transparent"
+          ? getTintStrength(mesh)
+          : null
       });
 
       exportColorsButton.disabled = colorSelections.size === 0;
@@ -1105,7 +1319,10 @@
           partName: item.partName,
           sourcePart: item.sourcePart,
           materialName: item.materialName,
-          colorHex: item.colorHex
+          colorHex: item.colorHex,
+          materialType: item.materialType,
+          finish: item.finish,
+          tintStrength: item.tintStrength
         }))
       };
     }
@@ -1197,6 +1414,7 @@
       colorPicker.disabled = true;
       hexInput.disabled = true;
       resetPartButton.disabled = true;
+      updateMaterialControls(null);
       paletteRows.forEach(({ row }) => row.classList.remove("selected"));
     }
 
@@ -1223,6 +1441,7 @@
       colorPicker.disabled = false;
       hexInput.disabled = false;
       resetPartButton.disabled = !selectedOriginalColor;
+      updateMaterialControls(mesh);
       paletteRows.forEach(({ row }) => row.classList.remove("selected"));
       const rowData = paletteRows.get(mesh.uniqueId);
       if (rowData) rowData.row.classList.add("selected");
@@ -1528,6 +1747,18 @@
       camera.setTarget(defaultCameraState.target);
     });
 
+    materialType.addEventListener("change", event => {
+      setSelectedMaterialMode(event.target.value);
+    });
+
+    finishSelect.addEventListener("change", event => {
+      setSelectedFinish(event.target.value);
+    });
+
+    tintStrength.addEventListener("input", event => {
+      setSelectedTintStrength(event.target.value);
+    });
+
     themeSelect.addEventListener("change", event => {
       applyTheme(event.target.value);
     });
@@ -1536,6 +1767,7 @@
     emailProjectButton.addEventListener("click", emailProject);
 
     initializeThemeSelector();
+    updateMaterialControls(null);
     loadController();
 
     engine.runRenderLoop(() => scene.render());
