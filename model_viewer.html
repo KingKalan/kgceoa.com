@@ -466,11 +466,7 @@
 
     <div class="section">
       <span class="label">Model</span>
-      <div class="value">controller.glb</div>
-      <div class="status">
-        <span id="statusDot" class="status-dot"></span>
-        <span id="statusText">Loading controller.glb…</span>
-      </div>
+      <div class="value">Controller</div>
     </div>
 
     <div class="section">
@@ -537,8 +533,13 @@
     const emailProjectButton = document.getElementById("emailProject");
     const emptyState = document.getElementById("emptyState");
     const loading = document.getElementById("loading");
-    const statusDot = document.getElementById("statusDot");
-    const statusText = document.getElementById("statusText");
+    const statusDot = document.getElementById("statusDot") || {
+      className: "",
+      classList: { add() {} }
+    };
+    const statusText = document.getElementById("statusText") || {
+      textContent: ""
+    };
 
     const engine = new BABYLON.Engine(canvas, true, {
       preserveDrawingBuffer: true,
@@ -787,7 +788,13 @@
     }
 
     function getPartDisplayName(mesh) {
-      return mesh?.metadata?.controllerPart || mesh?.name || "Unnamed part";
+      const groupName = mesh?.metadata?.controllerPart;
+      return (
+        PART_DISPLAY_NAMES[groupName] ||
+        groupName ||
+        mesh?.name ||
+        "Unnamed part"
+      );
     }
 
     function recordColorSelection(mesh, material, hexColor) {
@@ -796,7 +803,8 @@
       const partKey = getPartKey(mesh);
 
       colorSelections.set(partKey, {
-        partName: partKey,
+        partName: getPartDisplayName(mesh),
+        sourcePart: mesh?.metadata?.controllerPart || mesh?.name || "Unnamed part",
         materialName: material.name || "Unnamed material",
         colorHex: hexColor.toUpperCase()
       });
@@ -813,6 +821,7 @@
         savedAt: new Date().toISOString(),
         parts: Array.from(colorSelections.values()).map(item => ({
           partName: item.partName,
+          sourcePart: item.sourcePart,
           materialName: item.materialName,
           colorHex: item.colorHex
         }))
@@ -1002,6 +1011,25 @@
       "Start_Select.glb",
       "X_Y.glb"
     ];
+
+    /*
+      EDIT THESE NAMES
+      ----------------
+      The key on the left must stay exactly the same.
+      Change only the quoted display name on the right.
+
+      Example:
+        Body_front: "Front Shell"
+    */
+    const PART_DISPLAY_NAMES = {
+      A_B: "A / B Buttons",
+      Body_back: "Back Shell",
+      Body_front: "Front Shell",
+      D_Pad: "D-Pad",
+      L_R: "Shoulder Buttons",
+      Start_Select: "Start / Select",
+      X_Y: "X / Y Buttons"
+    };
 
     async function loadController() {
       loading.classList.add("show");
