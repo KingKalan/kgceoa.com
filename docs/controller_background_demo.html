@@ -54,7 +54,7 @@
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(180deg, rgba(11,15,26,.02), rgba(11,15,26,.18));
+      background:linear-gradient(180deg, rgba(11,15,26,.00), rgba(11,15,26,.10));
       z-index:2;
     }
 
@@ -67,11 +67,12 @@
       -webkit-mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
       mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
       filter:
-        saturate(1.5)
-        brightness(1.28)
-        drop-shadow(0 0 10px color-mix(in srgb, var(--controller-color) 84%, white 16%))
-        drop-shadow(0 0 24px color-mix(in srgb, var(--controller-color) 74%, white 26%))
-        drop-shadow(0 0 40px color-mix(in srgb, var(--controller-color) 68%, white 32%));
+        saturate(1.65)
+        brightness(1.38)
+        drop-shadow(0 0 12px color-mix(in srgb, var(--controller-color) 82%, white 18%))
+        drop-shadow(0 0 28px color-mix(in srgb, var(--controller-color) 70%, white 30%))
+        drop-shadow(0 0 52px color-mix(in srgb, var(--controller-color) 62%, white 38%))
+        drop-shadow(0 0 86px color-mix(in srgb, var(--controller-color) 54%, white 46%));
       mix-blend-mode:screen;
       animation:bubble-drift var(--duration) ease-in-out var(--delay) infinite alternate;
       transform-origin:center;
@@ -324,7 +325,7 @@
         controller.style.left = random(-8, 96) + "%";
         controller.style.top = random(-6, 96) + "%";
         controller.style.setProperty("--size", `clamp(${Math.round(baseSize * 0.72)}px, ${(baseSize / 12).toFixed(2)}vw, ${Math.round(baseSize)}px)`);
-        controller.style.setProperty("--opacity", random(color === "#FFFFFF" ? 0.22 : 0.18, color === "#FFFFFF" ? 0.38 : 0.34).toFixed(2));
+        controller.style.setProperty("--opacity", random(color === "#FFFFFF" ? 0.30 : 0.24, color === "#FFFFFF" ? 0.48 : 0.42).toFixed(2));
         controller.style.setProperty("--controller-color", color);
         controller.style.setProperty("--duration", duration.toFixed(2) + "s");
         controller.style.setProperty("--delay", (-random(0, duration)).toFixed(2) + "s");
