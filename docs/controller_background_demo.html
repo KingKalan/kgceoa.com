@@ -54,7 +54,7 @@
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(180deg, rgba(11,15,26,.1), rgba(11,15,26,.5));
+      background:linear-gradient(180deg, rgba(11,15,26,.02), rgba(11,15,26,.18));
       z-index:2;
     }
 
@@ -66,7 +66,11 @@
       background:var(--controller-color);
       -webkit-mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
       mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
-      filter:drop-shadow(0 0 10px var(--controller-color));
+      filter:
+        saturate(1.35)
+        brightness(1.18)
+        drop-shadow(0 0 8px color-mix(in srgb, var(--controller-color) 88%, white 12%))
+        drop-shadow(0 0 20px color-mix(in srgb, var(--controller-color) 80%, white 20%));
       mix-blend-mode:screen;
       animation:bubble-drift var(--duration) ease-in-out var(--delay) infinite alternate;
       transform-origin:center;
@@ -319,7 +323,7 @@
         controller.style.left = random(-8, 96) + "%";
         controller.style.top = random(-6, 96) + "%";
         controller.style.setProperty("--size", `clamp(${Math.round(baseSize * 0.72)}px, ${(baseSize / 12).toFixed(2)}vw, ${Math.round(baseSize)}px)`);
-        controller.style.setProperty("--opacity", random(0.07, color === "#FFFFFF" ? 0.16 : 0.22).toFixed(2));
+        controller.style.setProperty("--opacity", random(color === "#FFFFFF" ? 0.22 : 0.18, color === "#FFFFFF" ? 0.38 : 0.34).toFixed(2));
         controller.style.setProperty("--controller-color", color);
         controller.style.setProperty("--duration", duration.toFixed(2) + "s");
         controller.style.setProperty("--delay", (-random(0, duration)).toFixed(2) + "s");
