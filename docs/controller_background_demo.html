@@ -63,63 +63,44 @@
       width:var(--size);
       aspect-ratio:147.34284132 / 72.99592632;
       opacity:var(--opacity);
-      background:linear-gradient(120deg, var(--color-a), var(--color-b));
+      background:var(--controller-color);
       -webkit-mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
       mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
-      filter:drop-shadow(0 0 14px var(--glow));
-      animation:controller-drift var(--duration) ease-in-out var(--delay) infinite alternate;
-      transform:rotate(var(--rotation));
+      filter:drop-shadow(0 0 10px var(--controller-color));
+      mix-blend-mode:screen;
+      animation:bubble-drift var(--duration) ease-in-out var(--delay) infinite alternate;
       transform-origin:center;
       will-change:transform;
       z-index:1;
     }
 
-    .controller-1{
-      --size:clamp(220px,29vw,430px); --opacity:.28;
-      --color-a:#5fd4ff; --color-b:#8a7dff; --glow:rgba(95,212,255,.35);
-      --duration:5.67s; --delay:-4s; --rotation:-13deg;
-      --x:52px; --y:-30px; --r:7deg; --scale:1.06;
-      top:5%; left:-7%;
-    }
-
-    .controller-2{
-      --size:clamp(170px,23vw,330px); --opacity:.18;
-      --color-a:#8a7dff; --color-b:#5fd4ff; --glow:rgba(138,125,255,.32);
-      --duration:7s; --delay:-11s; --rotation:18deg;
-      --x:-64px; --y:44px; --r:-10deg; --scale:.96;
-      top:10%; right:-5%;
-    }
-
-    .controller-3{
-      --size:clamp(150px,19vw,270px); --opacity:.13;
-      --color-a:#64ffb0; --color-b:#5fd4ff; --glow:rgba(100,255,176,.28);
-      --duration:6.33s; --delay:-7s; --rotation:9deg;
-      --x:45px; --y:-55px; --r:13deg; --scale:1.08;
-      top:43%; left:7%;
-    }
-
-    .controller-4{
-      --size:clamp(220px,31vw,460px); --opacity:.22;
-      --color-a:#5fd4ff; --color-b:#8a7dff; --glow:rgba(95,212,255,.34);
-      --duration:8s; --delay:-15s; --rotation:-20deg;
-      --x:-58px; --y:-38px; --r:12deg; --scale:1.04;
-      top:59%; right:-10%;
-    }
-
-    .controller-5{
-      --size:clamp(120px,15vw,220px); --opacity:.12;
-      --color-a:#ffd078; --color-b:#8a7dff; --glow:rgba(255,208,120,.24);
-      --duration:5s; --delay:-9s; --rotation:26deg;
-      --x:34px; --y:46px; --r:-12deg; --scale:.92;
-      bottom:3%; left:27%;
-    }
-
-    @keyframes controller-drift{
+    @keyframes bubble-drift{
       0%{
-        transform:translate3d(0,0,0) rotate(var(--rotation)) scale(1);
+        transform:
+          translate3d(0,0,0)
+          rotate(var(--rotation-start))
+          scale(var(--scale-start));
       }
+
+      33%{
+        transform:
+          translate3d(var(--x1),var(--y1),0)
+          rotate(var(--rotation-mid))
+          scale(var(--scale-mid));
+      }
+
+      66%{
+        transform:
+          translate3d(var(--x2),var(--y2),0)
+          rotate(var(--rotation-late))
+          scale(var(--scale-late));
+      }
+
       100%{
-        transform:translate3d(var(--x),var(--y),0) rotate(calc(var(--rotation) + var(--r))) scale(var(--scale));
+        transform:
+          translate3d(var(--x3),var(--y3),0)
+          rotate(var(--rotation-end))
+          scale(var(--scale-end));
       }
     }
 
@@ -259,8 +240,6 @@
       nav{justify-content:flex-start}
       .grid{grid-template-columns:1fr}
       .hero{min-height:50vh}
-      .controller-2{right:-18%}
-      .controller-4{right:-24%}
     }
 
     @media (prefers-reduced-motion:reduce){
@@ -270,13 +249,7 @@
   </style>
 </head>
 <body>
-  <div class="controller-field" aria-hidden="true">
-    <div class="floating-controller controller-1"></div>
-    <div class="floating-controller controller-2"></div>
-    <div class="floating-controller controller-3"></div>
-    <div class="floating-controller controller-4"></div>
-    <div class="floating-controller controller-5"></div>
-  </div>
+  <div id="controllerField" class="controller-field" aria-hidden="true"></div>
 
   <div class="wrap">
     <header>
@@ -297,7 +270,7 @@
         <div class="eyebrow">Background Concept</div>
         <h1>Floaty Controller Profiles</h1>
         <p class="lead">
-          Your controller profile SVG can be repeated as subtle animated artwork behind any KCEA page. The shapes drift slowly, remain behind the content, and use the same cyan and violet accents as the existing site theme.
+          Your controller profile SVG can be repeated as subtle animated artwork behind any KCEA page. Twenty smaller controller silhouettes move independently like bubbles, with randomized scale, motion, and color while remaining behind the page content.
         </p>
       </section>
 
@@ -309,12 +282,12 @@
 
         <article class="card">
           <h2>Software</h2>
-          <p>Opacity and movement stay restrained so headings, descriptions, and links remain easy to read.</p>
+          <p>Each controller follows its own gentle bubble path without collision calculations, keeping the background lively without becoming distracting.</p>
         </article>
 
         <article class="card">
           <h2>KGx SANo</h2>
-          <p>The SVG is used as a reusable CSS mask, allowing each copy to have its own size, tint, glow, and motion.</p>
+          <p>The SVG is used as a reusable CSS mask with randomized sizes and colors selected from gold, cyan, violet, and white.</p>
         </article>
       </section>
     </main>
@@ -326,6 +299,56 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    (function createControllerField(){
+      const CONTROLLER_COUNT = 20;
+      const colors = ["#EFBF04", "#00FFF0", "#4E45E8", "#FFFFFF"];
+      const field = document.getElementById("controllerField");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const random = (min, max) => Math.random() * (max - min) + min;
+      const randomSigned = (min, max) => random(min, max) * (Math.random() < 0.5 ? -1 : 1);
+
+      for(let i = 0; i < CONTROLLER_COUNT; i++){
+        const controller = document.createElement("div");
+        controller.className = "floating-controller";
+
+        const baseSize = random(62, 170);
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const duration = random(10, 22);
+
+        controller.style.left = random(-8, 96) + "%";
+        controller.style.top = random(-6, 96) + "%";
+        controller.style.setProperty("--size", `clamp(${Math.round(baseSize * 0.72)}px, ${(baseSize / 12).toFixed(2)}vw, ${Math.round(baseSize)}px)`);
+        controller.style.setProperty("--opacity", random(0.07, color === "#FFFFFF" ? 0.16 : 0.22).toFixed(2));
+        controller.style.setProperty("--controller-color", color);
+        controller.style.setProperty("--duration", duration.toFixed(2) + "s");
+        controller.style.setProperty("--delay", (-random(0, duration)).toFixed(2) + "s");
+
+        controller.style.setProperty("--x1", randomSigned(18, 62).toFixed(1) + "px");
+        controller.style.setProperty("--y1", randomSigned(18, 58).toFixed(1) + "px");
+        controller.style.setProperty("--x2", randomSigned(34, 92).toFixed(1) + "px");
+        controller.style.setProperty("--y2", randomSigned(32, 88).toFixed(1) + "px");
+        controller.style.setProperty("--x3", randomSigned(15, 74).toFixed(1) + "px");
+        controller.style.setProperty("--y3", randomSigned(22, 76).toFixed(1) + "px");
+
+        controller.style.setProperty("--rotation-start", random(-28, 28).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-mid", random(-34, 34).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-late", random(-38, 38).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-end", random(-30, 30).toFixed(1) + "deg");
+
+        controller.style.setProperty("--scale-start", random(0.62, 0.88).toFixed(2));
+        controller.style.setProperty("--scale-mid", random(0.78, 1.16).toFixed(2));
+        controller.style.setProperty("--scale-late", random(0.68, 1.28).toFixed(2));
+        controller.style.setProperty("--scale-end", random(0.74, 1.20).toFixed(2));
+
+        if(reducedMotion){
+          controller.style.animation = "none";
+          controller.style.transform = `rotate(${random(-25, 25).toFixed(1)}deg) scale(${random(0.7, 1.05).toFixed(2)})`;
+        }
+
+        field.appendChild(controller);
+      }
+    })();
   </script>
 </body>
 </html>
