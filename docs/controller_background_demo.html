@@ -52,15 +52,16 @@
 
     .floating-controller{
       position:absolute;
+      display:block;
       width:var(--size);
-      aspect-ratio:147.34284132 / 72.99592632;
+      height:auto;
+      max-width:none;
       opacity:1;
-      background:var(--controller-color);
-      -webkit-mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
-      mask:url("Controller_Profile_sketch.svg") center / contain no-repeat;
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
       animation:bubble-drift var(--duration) ease-in-out var(--delay) infinite alternate;
       transform-origin:center;
-      will-change:transform;
       contain:layout paint;
       z-index:1;
     }
@@ -261,7 +262,7 @@
         <div class="eyebrow">Background Concept</div>
         <h1>Floaty Controller Profiles</h1>
         <p class="lead">
-          Your controller profile SVG can be repeated as subtle animated artwork behind any KCEA page. Twenty smaller controller silhouettes move independently like bubbles, with randomized scale, motion, and color while remaining behind the page content.
+          Your controller profile SVG can be repeated as subtle animated artwork behind any KCEA page. Finished cyan, violet, and gold controller graphics move independently like bubbles, with randomized size, motion, and rotation while remaining behind the page content.
         </p>
       </section>
 
@@ -278,7 +279,7 @@
 
         <article class="card">
           <h2>KGx SANo</h2>
-          <p>The SVG is used as a reusable CSS mask with randomized sizes and colors selected from gold, cyan, violet, and white.</p>
+          <p>The page randomly selects one of the three finished controller graphics, so no CSS mask or live recoloring is required.</p>
         </article>
       </section>
     </main>
@@ -292,25 +293,37 @@
     document.getElementById("year").textContent = new Date().getFullYear();
 
     (function createControllerField(){
-      const CONTROLLER_COUNT = 20;
-      const colors = ["#EFBF04", "#00FFF0", "#4E45E8", "#FFFFFF"];
+      const controllerImages = [
+        "Controller_Profile_00FFF0.svg",
+        "Controller_Profile_4E45E8.svg",
+        "Controller_Profile_EFBF04.svg"
+      ];
+
       const field = document.getElementById("controllerField");
-      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const isMobile = window.matchMedia("(max-width:760px)").matches;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+      const controllerCount = isMobile ? 8 : 20;
       const random = (min, max) => Math.random() * (max - min) + min;
       const randomSigned = (min, max) => random(min, max) * (Math.random() < 0.5 ? -1 : 1);
 
-      for(let i = 0; i < CONTROLLER_COUNT; i++){
-        const controller = document.createElement("div");
-        controller.className = "floating-controller";
-
+      for(let i = 0; i < controllerCount; i++){
+        const controller = document.createElement("img");
         const baseSize = random(62, 170);
-        const color = colors[Math.floor(Math.random() * colors.length)];
         const duration = random(10, 22);
+
+        controller.className = "floating-controller";
+        controller.src = controllerImages[Math.floor(Math.random() * controllerImages.length)];
+        controller.alt = "";
+        controller.setAttribute("aria-hidden", "true");
+        controller.decoding = "async";
+        controller.draggable = false;
 
         controller.style.left = random(-8, 96) + "%";
         controller.style.top = random(-6, 96) + "%";
-        controller.style.setProperty("--size", `clamp(${Math.round(baseSize * 0.72)}px, ${(baseSize / 12).toFixed(2)}vw, ${Math.round(baseSize)}px)`);
-        controller.style.setProperty("--controller-color", color);
+        controller.style.setProperty(
+          "--size",
+          `clamp(${Math.round(baseSize * 0.72)}px, ${(baseSize / 12).toFixed(2)}vw, ${Math.round(baseSize)}px)`
+        );
         controller.style.setProperty("--duration", duration.toFixed(2) + "s");
         controller.style.setProperty("--delay", (-random(0, duration)).toFixed(2) + "s");
 
@@ -335,6 +348,10 @@
           controller.style.animation = "none";
           controller.style.transform = `rotate(${random(-25, 25).toFixed(1)}deg) scale(${random(0.7, 1.05).toFixed(2)})`;
         }
+
+        controller.addEventListener("error", function(){
+          controller.remove();
+        });
 
         field.appendChild(controller);
       }
