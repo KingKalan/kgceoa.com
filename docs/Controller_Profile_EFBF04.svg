@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="168.67621mm"
+   height="95.361671mm"
+   viewBox="0 0 168.67622 95.361673"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="Controller_Profile_sketch.svg"
+   inkscape:export-filename="Controller_Profile_4E45E8.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter1"
+       x="-0.081611523"
+       y="-0.16815911"
+       width="1.163223"
+       height="1.3363182">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.5799501"
+         id="feGaussianBlur1" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter2"
+       x="-0.019180236"
+       y="-0.039520565"
+       width="1.0383605"
+       height="1.0790411">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.65434058"
+         id="feGaussianBlur2" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter3"
+       x="-0.018230696"
+       y="-0.037564104"
+       width="1.0364614"
+       height="1.0751282">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.26395879"
+         id="feGaussianBlur3" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:export-bgcolor="#ffffff00">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="168.67622"
+       height="95.361671"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     id="Violet"
+     transform="matrix(0.99861315,0,0,-1.0185774,83.941904,17.087918)">
+    <g
+       id="g1">
+      <path
+         id="Bloom"
+         d="M 58.894682,-1.5973898e-6 72.222519,-39.713219 65.873955,-65.087646 h -28.20208 l -8.265953,12.726818 h -58.774567 l -7.937252,-12.727543 H -65.881104 L -72.231247,-39.6875 -58.580314,2.0454491e-6 -53.006726,5.01848 H 53.321098 L 58.894682,-1.5973898e-6"
+         stroke="#f1f3f5"
+         stroke-width="0.7 px"
+         style="opacity:1;mix-blend-mode:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#efbf04;stroke-width:6.39445;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1)"
+         transform="matrix(1.0052282,0,0,0.99933118,0.40113347,-0.02008817)" />
+      <path
+         id="Radiate"
+         d="m 58.895135,-4.639e-4 13.32784,-39.7132171 -6.34857,-25.374427 H 37.672329 l -8.265953,12.726818 h -58.774567 l -7.937252,-12.727543 H -65.88065 l -6.350143,25.400871 13.650933,39.6875021 5.573588,5.0184779 H 53.321555 l 5.57358,-5.0184819"
+         stroke="#f1f3f5"
+         stroke-width="0.7 px"
+         style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#efbf04;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3)" />
+      <path
+         id="Bright"
+         d="m 58.894863,2.4e-5 13.32784,-39.713217 -6.34857,-25.374427 H 37.672057 l -8.265953,12.726818 h -58.774567 l -7.937252,-12.727543 h -28.575207 l -6.350143,25.400871 13.650933,39.687502 5.573588,5.018478 H 53.321283 L 58.894863,2.4e-5"
+         stroke="#f1f3f5"
+         stroke-width="0.7 px"
+         style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#efde9c;stroke-width:2.40049;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter2)" />
+    </g>
+    <title
+       id="title1">b'Part__Part2DObjectPython001'</title>
+  </g>
+</svg>
