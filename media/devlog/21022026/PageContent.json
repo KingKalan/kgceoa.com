@@ -8,6 +8,39 @@
   "category": "Hardware",
   "readTime": "12 min",
   "tags": [
-    "Controller"
-  ]
+	"Controller"
+     ],
+  "body": [
+"Finishing up the PerfBoard prototype. This is my first real public update. Originally was posted to Facebook, but brought over to the webpage. Expanding further on whats going on in each image."
+
+"Quick comparison shot of the breadboard, perfboard, and an actual SNES controller. [{image01.jpg}]"
+
+"Clean shot of just the perfboard version. This side of the board looks so clean and neat. [{image02.jpg}]"
+
+"This side of the perfboard however, not so neat looking. I did my best, it is my first time, but couldn't get away from the spaghetti mess this became. [{image03.jpg}]"
+
+"This was the first attempt at the perfboard version. Was incredibly small, and was just uncomfortable to test. I decided that i was going to use a larger perfboard for this controller, which is pictured here. [{image04.jpg}]"
+
+"This image is the size comparison of the first perfboard and the breaboard versions. [{image05.jpg}]" 
+
+"Video test of the breadboard version. [{video01.mp4}]"
+
+"Images of the breaboard version. [{image06.jpg}] [{image10.jpg}]"
+
+"This is the first schematic that i actually understood what was going on inside the controller. [{image07.jpg}]"
+
+"this are excerpts from the data sheets on one of the chips that are being used in the controller. [{image08.jpg}] [{image09.jpg}]"
+
+"This is the first 3D print of the controller shell. This is prior to getting the Elegoo Neptune 4 MAX. [{image11.jpg}]"
+
+"this image is the first 3D print from my own 3D printer. [{image12.jpg}]"
+
+"These are the first protoype shells. They are molded in clay. The crazy looks i got carrying this thing around is crazy. [{image13.jpg}] [{image14.jpg}]"
+
+"I eventually cleaned it up on Prototype 02. [{image15.jpg}]
+Here is a couple more shots of Prototype 02. [{image16.jpg}] [{image17.jpg}]"
+
+"The video of Prototype 02 after being painted. [{video02.mp4}]"
+
+]
 }
