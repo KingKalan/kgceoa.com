@@ -1,0 +1,32 @@
+{
+  "header": "Mechanical Work on the Controller",
+  "description": "Nearly functional, the controller is undergoing so mechanical revisioning",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Aligning Mechanical and electrical components."
+  },
+  "category": "Hardware",
+  "readTime": "11 min",
+  "tags": [
+	"Controller"
+	],
+"body:" [
+"Doing some mechanical alignments with parts. It's currently all computer work but we are getting there.",
+
+"Current revision with rough draft PCB board in place. looks like everything is aligning correctly.",
+"[{image01.jpg}]",
+
+"This is viewing the fitment and stroke tolerances of the silicone membranes.",
+
+"[{image02.jpg}]",
+
+"This image is viewing the alignment of mounting screw holes between shell halves and the PCB.",
+
+"[{image03.jpg}]", 
+
+"Added the supports behind the buttons to absorb the stress of flexing the PCB.",
+
+"[{image04.jpg}]"
+
+]
+}
