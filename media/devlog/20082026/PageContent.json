@@ -1,1 +1,16 @@
 
+{
+  "header": "The Dev Cart Is Becoming Real Hardware",
+  "description": "The cartridge architecture is moving out of KiCad and toward bench testing. NOR flash, SRAM, bus isolation, USB programming, and the RP2040 control path are being broken into pieces that can be tested independently before the final board goes to fabrication.",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Bench-test the cartridge buses before PCB fabrication."
+  },
+  "category": "Hardware",
+  "tags": [
+    "SANo",
+    "Dev Cart",
+    "KiCad",
+    "RP2040"
+  ]
+}
