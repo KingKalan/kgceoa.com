@@ -1,0 +1,11 @@
+{
+  "header": "From prototype clay to 3D printed shells.",
+  "description": "The controller is coming together. Aesthetics have been finalized, breadboard prototypes are functioning. Time to start designing the PCB in KiCAD.",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Route traces for PCB manufacturing"
+  },
+  "category": "Hardware",
+  "readTime": "12 min",
+  "tags": [Controller]
+}
