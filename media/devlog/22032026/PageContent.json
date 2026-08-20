@@ -1,0 +1,32 @@
+{
+  "header": "Welcome Home Saturn",
+  "description": "Just purchased the Elegoo Saturn 4 Ultra 16K. Printing shells with resin now.",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Refine settings for stable printing."
+  },
+  "category": "Hardware",
+  "readTime": "11 min",
+  "tags": [
+	"Controller"
+	],
+"body": [
+
+"Just a couple of video clips showing the Saturn during operation.",
+
+"[{video01.mp4}]",
+
+"[{video02.mp4}]",
+
+"My first prints with resin. This didnt go how i intended it to. The supports were far too dense.",
+
+"[{image01.jpg}]",
+
+"[{image02.jpg}]",
+
+"After a bit of research and some more test prints, I finally printed a decent shell. While trying to remove from the build plate, I chipped off the corner of the shell. Overall though, I'm satisfied with the outcome.",
+
+"{[image03.jpg}]"
+ 
+]
+}
