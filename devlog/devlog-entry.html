@@ -286,6 +286,22 @@
       box-shadow:0 16px 40px rgba(0,0,0,.34);
     }
 
+    .article-video-wrap{
+      width:min(1040px,calc(100vw - 32px));
+      margin:34px 50% 38px;
+      transform:translateX(-50%);
+    }
+
+    .article-video{
+      display:block;
+      width:100%;
+      max-height:720px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#090d16;
+      box-shadow:0 16px 40px rgba(0,0,0,.34);
+    }
+
     .back-link{
       display:inline-flex;
       align-items:center;
@@ -334,7 +350,8 @@
       .entry-shell{padding-top:54px}
       .hero-media,
       .hero-video{min-height:260px}
-      .article-image-wrap{width:100%; margin-left:0; margin-right:0; transform:none}
+      .article-image-wrap,
+      .article-video-wrap{width:100%; margin-left:0; margin-right:0; transform:none}
     }
 
     @media (prefers-reduced-motion:reduce){
@@ -416,15 +433,9 @@
       return element;
     }
 
-    function imageTokenFilename(value){
-      if(typeof value !== "string") return null;
+    function parseMediaFilename(filename){
+      filename = String(filename || "").trim();
 
-      const match = value.trim().match(/^\[\{([^{}]+)\}\]$/);
-      if(!match) return null;
-
-      const filename = match[1].trim();
-
-      // Keep tokens local to the dated devlog folder.
       if(
         !filename ||
         filename.includes("/") ||
@@ -434,11 +445,87 @@
         return null;
       }
 
-      if(!/\.(?:jpe?g|png|webp|gif|avif)$/i.test(filename)){
-        return null;
+      if(/\.(?:jpe?g|png|webp|gif|avif)$/i.test(filename)){
+        return {type:"image", filename};
       }
 
-      return filename;
+      if(/\.(?:mp4|webm)$/i.test(filename)){
+        return {type:"video", filename};
+      }
+
+      return null;
+    }
+
+    function appendMedia(body, folderName, media){
+      if(media.type === "image"){
+        const imageWrap = document.createElement("figure");
+        imageWrap.className = "article-image-wrap";
+
+        const image = document.createElement("img");
+        image.className = "article-image";
+        image.src = `${DEVLOG_ROOT}/${folderName}/${encodeURIComponent(media.filename)}`;
+        image.alt = "";
+        image.loading = "lazy";
+        image.decoding = "async";
+
+        imageWrap.appendChild(image);
+        body.appendChild(imageWrap);
+        return;
+      }
+
+      if(media.type === "video"){
+        const videoWrap = document.createElement("div");
+        videoWrap.className = "article-video-wrap";
+
+        const video = document.createElement("video");
+        video.className = "article-video";
+        video.controls = true;
+        video.preload = "metadata";
+        video.playsInline = true;
+
+        // Article videos do not autoplay or loop.
+        const source = document.createElement("source");
+        source.src = `${DEVLOG_ROOT}/${folderName}/${encodeURIComponent(media.filename)}`;
+        source.type = media.filename.toLowerCase().endsWith(".webm")
+          ? "video/webm"
+          : "video/mp4";
+
+        video.appendChild(source);
+        videoWrap.appendChild(video);
+        body.appendChild(videoWrap);
+      }
+    }
+
+    function appendBodyItem(body, folderName, item){
+      // Tokens may appear anywhere inside a body string.
+      // Example: "Breadboard test. [{video01.mp4}]"
+      const tokenPattern = /\[\{([^{}]+)\}\]/g;
+      let lastIndex = 0;
+      let match;
+
+      while((match = tokenPattern.exec(item)) !== null){
+        const before = item.slice(lastIndex, match.index).trim();
+
+        if(before){
+          body.appendChild(createTextElement("p", "", before));
+        }
+
+        const media = parseMediaFilename(match[1]);
+
+        if(media){
+          appendMedia(body, folderName, media);
+        }else{
+          body.appendChild(createTextElement("p", "", match[0]));
+        }
+
+        lastIndex = tokenPattern.lastIndex;
+      }
+
+      const after = item.slice(lastIndex).trim();
+
+      if(after){
+        body.appendChild(createTextElement("p", "", after));
+      }
     }
 
     function buildEntry(folderName, content){
@@ -526,29 +613,8 @@
       const bodyItems = Array.isArray(content.body) ? content.body : [];
 
       for(const item of bodyItems){
-        if(typeof item !== "string") continue;
-
-        const filename = imageTokenFilename(item);
-
-        if(filename){
-          const imageWrap = document.createElement("figure");
-          imageWrap.className = "article-image-wrap";
-
-          const image = document.createElement("img");
-          image.className = "article-image";
-          image.src = `${DEVLOG_ROOT}/${folderName}/${encodeURIComponent(filename)}`;
-          image.alt = "";
-          image.loading = "lazy";
-          image.decoding = "async";
-
-          imageWrap.appendChild(image);
-          body.appendChild(imageWrap);
-          continue;
-        }
-
-        if(item.trim()){
-          body.appendChild(createTextElement("p", "", item));
-        }
+        if(typeof item !== "string" || !item.trim()) continue;
+        appendBodyItem(body, folderName, item);
       }
 
       if(!body.children.length && content.description){
