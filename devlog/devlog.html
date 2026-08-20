@@ -555,7 +555,7 @@
       const article = document.createElement("a");
       article.className = "devlog-card";
       article.dataset.devlogDate = folderName;
-      article.href = `/devlog-entry.html?date=${encodeURIComponent(folderName)}`;
+      article.href = `/devlog/devlog-entry.html?date=${encodeURIComponent(folderName)}`;
       article.setAttribute(
         "aria-label",
         `Open devlog entry: ${content.header || "Untitled Update"}`
