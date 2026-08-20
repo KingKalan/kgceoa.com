@@ -237,6 +237,10 @@
 
     .devlog-card{
       display:grid;
+      color:inherit;
+      text-decoration:none;
+      cursor:pointer;
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
       grid-template-columns:minmax(0,1.8fr) minmax(300px,.95fr);
       min-height:360px;
       overflow:hidden;
@@ -245,6 +249,17 @@
       background:linear-gradient(135deg,rgba(15,21,36,.96),rgba(17,26,43,.92));
       box-shadow:var(--shadow);
       backdrop-filter:blur(10px);
+    }
+
+    .devlog-card:hover{
+      transform:translateY(-3px);
+      border-color:rgba(95,212,255,.38);
+      box-shadow:0 16px 34px rgba(0,0,0,.42), 0 2px 0 rgba(255,255,255,.025) inset;
+    }
+
+    .devlog-card:focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:4px;
     }
 
     .card-copy{
@@ -537,9 +552,14 @@
     }
 
     function createDevlogCard(folderName, content){
-      const article = document.createElement("article");
+      const article = document.createElement("a");
       article.className = "devlog-card";
       article.dataset.devlogDate = folderName;
+      article.href = `/devlog-entry.html?date=${encodeURIComponent(folderName)}`;
+      article.setAttribute(
+        "aria-label",
+        `Open devlog entry: ${content.header || "Untitled Update"}`
+      );
 
       const copy = document.createElement("div");
       copy.className = "card-copy";
@@ -599,7 +619,6 @@
       source.type = "video/mp4";
       video.appendChild(source);
 
-      /* If a banner is missing or cannot play, the styled background remains visible. */
       video.addEventListener("error", () => video.remove());
 
       const banner = content.banner || {};
