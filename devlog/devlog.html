@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +16,6 @@
       --bg:#0b0f1a;
       --panel:#0f1524;
       --panel-2:#111a2b;
-      --panel-3:#0c1220;
       --ink:#e7ecf7;
       --muted:#9fb2d9;
       --dim:#7182a5;
@@ -61,12 +59,13 @@
       content:"";
       position:absolute;
       inset:0;
-      background:rgba(11,15,26,.32);
       z-index:2;
+      background:rgba(11,15,26,.32);
     }
 
     .floating-controller{
       position:absolute;
+      z-index:1;
       display:block;
       width:var(--size);
       height:auto;
@@ -78,33 +77,20 @@
       animation:bubble-drift var(--duration) ease-in-out var(--delay) infinite alternate;
       transform-origin:center;
       contain:layout paint;
-      z-index:1;
     }
 
     @keyframes bubble-drift{
       0%{
-        transform:
-          translate3d(0,0,0)
-          rotate(var(--rotation-start))
-          scale(var(--scale-start));
+        transform:translate3d(0,0,0) rotate(var(--rotation-start)) scale(var(--scale-start));
       }
       33%{
-        transform:
-          translate3d(var(--x1),var(--y1),0)
-          rotate(var(--rotation-mid))
-          scale(var(--scale-mid));
+        transform:translate3d(var(--x1),var(--y1),0) rotate(var(--rotation-mid)) scale(var(--scale-mid));
       }
       66%{
-        transform:
-          translate3d(var(--x2),var(--y2),0)
-          rotate(var(--rotation-late))
-          scale(var(--scale-late));
+        transform:translate3d(var(--x2),var(--y2),0) rotate(var(--rotation-late)) scale(var(--scale-late));
       }
       100%{
-        transform:
-          translate3d(var(--x3),var(--y3),0)
-          rotate(var(--rotation-end))
-          scale(var(--scale-end));
+        transform:translate3d(var(--x3),var(--y3),0) rotate(var(--rotation-end)) scale(var(--scale-end));
       }
     }
 
@@ -164,8 +150,8 @@
     }
 
     .hero{
-      padding:86px 0 42px;
       max-width:820px;
+      padding:86px 0 42px;
     }
 
     .eyebrow{
@@ -196,7 +182,7 @@
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
       gap:14px;
-      margin:8px 0 34px;
+      margin:8px 0 38px;
     }
 
     .status-item{
@@ -235,7 +221,7 @@
     .section-heading h2{
       margin:0;
       font-family:Unbounded,Inter,sans-serif;
-      font-size:clamp(24px,3vw,34px);
+      font-size:clamp(28px,4vw,44px);
     }
 
     .section-heading p{
@@ -244,66 +230,61 @@
       font-size:13px;
     }
 
-    .featured{
-      position:relative;
-      overflow:hidden;
+    .devlog-list{
       display:grid;
-      grid-template-columns:minmax(0,1.45fr) minmax(260px,.75fr);
-      min-height:330px;
+      gap:22px;
+    }
+
+    .devlog-card{
+      display:grid;
+      grid-template-columns:minmax(0,1.8fr) minmax(300px,.95fr);
+      min-height:360px;
+      overflow:hidden;
       border:1px solid rgba(95,212,255,.14);
       border-radius:var(--radius);
-      background:
-        linear-gradient(135deg,rgba(15,21,36,.96),rgba(17,26,43,.90));
+      background:linear-gradient(135deg,rgba(15,21,36,.96),rgba(17,26,43,.92));
       box-shadow:var(--shadow);
       backdrop-filter:blur(10px);
     }
 
-    .featured::before{
-      content:"";
-      position:absolute;
-      width:280px;
-      height:280px;
-      right:-100px;
-      top:-110px;
-      border-radius:50%;
-      background:rgba(138,125,255,.13);
-      filter:blur(3px);
+    .card-copy{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-width:0;
+      padding:clamp(28px,4vw,44px);
     }
 
-    .featured-copy{
-      position:relative;
-      z-index:1;
-      padding:clamp(24px,4vw,42px);
-    }
-
-    .post-number{
+    .card-date{
+      margin-bottom:12px;
       color:var(--accent);
-      font-weight:800;
       font-size:12px;
-      letter-spacing:.14em;
+      font-weight:800;
+      letter-spacing:.13em;
       text-transform:uppercase;
     }
 
-    .featured h3{
-      max-width:15ch;
-      margin:10px 0 12px;
+    .card-title{
+      max-width:16ch;
+      margin:0 0 16px;
       font-family:Unbounded,Inter,sans-serif;
-      font-size:clamp(28px,4vw,42px);
+      font-size:clamp(27px,4vw,43px);
       line-height:1.12;
     }
 
-    .featured p{
-      max-width:62ch;
+    .card-description{
+      max-width:64ch;
       margin:0;
       color:var(--muted);
-      line-height:1.7;
+      font-size:clamp(15px,1.6vw,18px);
+      line-height:1.72;
     }
 
-    .meta{
+    .card-meta{
       display:flex;
       flex-wrap:wrap;
-      gap:10px 16px;
-      margin-top:22px;
+      gap:10px 18px;
+      margin-top:24px;
       color:var(--dim);
       font-size:12px;
       font-weight:700;
@@ -313,7 +294,7 @@
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      margin-top:20px;
+      margin-top:18px;
     }
 
     .tag{
@@ -331,18 +312,48 @@
       text-transform:uppercase;
     }
 
-    .featured-side{
+    .card-media{
       position:relative;
-      z-index:1;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-end;
-      padding:26px;
+      min-height:360px;
+      overflow:hidden;
       border-left:1px solid var(--line);
-      background:rgba(5,9,17,.18);
+      background:
+        radial-gradient(circle at 75% 12%, rgba(138,125,255,.22), transparent 38%),
+        #0c1220;
     }
 
-    .milestone-label{
+    .card-video{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      background:#0c1220;
+    }
+
+    .card-media::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      background:
+        linear-gradient(180deg,rgba(5,9,17,.08) 0%,rgba(5,9,17,.22) 42%,rgba(5,9,17,.90) 100%),
+        linear-gradient(90deg,rgba(5,9,17,.08),transparent 30%);
+      pointer-events:none;
+    }
+
+    .banner-copy{
+      position:absolute;
+      z-index:2;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:clamp(22px,3vw,32px);
+    }
+
+    .banner-label{
+      display:block;
+      margin-bottom:8px;
       color:var(--gold);
       font-size:11px;
       font-weight:800;
@@ -350,99 +361,30 @@
       text-transform:uppercase;
     }
 
-    .milestone-value{
-      margin:8px 0 0;
-      font-family:Unbounded,Inter,sans-serif;
-      font-size:20px;
-      line-height:1.35;
-    }
-
-    .progress{
-      height:7px;
-      margin-top:18px;
-      overflow:hidden;
-      border-radius:999px;
-      background:rgba(255,255,255,.07);
-    }
-
-    .progress > span{
-      display:block;
-      width:62%;
-      height:100%;
-      border-radius:inherit;
-      background:linear-gradient(90deg,var(--accent),var(--accent-2));
-    }
-
-    .entries{
-      display:grid;
-      gap:16px;
-    }
-
-    .entry{
-      display:grid;
-      grid-template-columns:160px 1fr;
-      gap:24px;
-      padding:24px;
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:linear-gradient(180deg,rgba(15,21,36,.88),rgba(17,26,43,.92));
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(8px);
-    }
-
-    .entry-date{
-      color:var(--dim);
-      font-size:12px;
-      line-height:1.55;
-      font-weight:700;
-    }
-
-    .entry-date strong{
-      display:block;
-      margin-bottom:3px;
-      color:var(--ink);
-      font-family:Unbounded,Inter,sans-serif;
-      font-size:14px;
-    }
-
-    .entry h3{
-      margin:0 0 8px;
-      font-family:Unbounded,Inter,sans-serif;
-      font-size:20px;
-      line-height:1.35;
-    }
-
-    .entry p{
+    .banner-text{
       margin:0;
+      color:#dce6ff;
+      font-family:Unbounded,Inter,sans-serif;
+      font-size:clamp(18px,2.3vw,25px);
+      font-weight:700;
+      line-height:1.4;
+      text-shadow:0 2px 14px rgba(0,0,0,.48);
+    }
+
+    .load-state{
+      padding:30px;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
       color:var(--muted);
-      font-size:14px;
-      line-height:1.7;
+      background:rgba(15,21,36,.78);
+      box-shadow:var(--shadow);
     }
 
-    .entry ul{
-      margin:13px 0 0;
-      padding-left:20px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.7;
-    }
-
-    .entry .tag-row{
-      margin-top:15px;
-    }
-
-    .template-note{
-      margin-top:28px;
-      padding:20px 22px;
-      border-left:3px solid var(--accent-2);
-      border-radius:0 14px 14px 0;
-      color:var(--muted);
-      background:rgba(138,125,255,.07);
-      line-height:1.65;
-    }
-
-    .template-note code{
+    .load-state strong{
+      display:block;
+      margin-bottom:6px;
       color:var(--ink);
+      font-family:Unbounded,Inter,sans-serif;
     }
 
     footer{
@@ -453,7 +395,7 @@
       font-size:12px;
     }
 
-    @media (max-width:800px){
+    @media (max-width:850px){
       header{
         align-items:flex-start;
         flex-direction:column;
@@ -461,27 +403,19 @@
 
       nav{justify-content:flex-start}
 
-      .status-strip{
-        grid-template-columns:1fr;
-      }
+      .status-strip{grid-template-columns:1fr}
 
-      .featured{
-        grid-template-columns:1fr;
-      }
+      .devlog-card{grid-template-columns:1fr}
 
-      .featured-side{
-        border-left:0;
+      .card-media{
+        min-height:300px;
         border-top:1px solid var(--line);
+        border-left:0;
       }
 
-      .entry{
-        grid-template-columns:1fr;
-        gap:12px;
-      }
+      .card-title{max-width:none}
 
-      .hero{
-        padding-top:62px;
-      }
+      .hero{padding-top:62px}
     }
 
     @media (prefers-reduced-motion:reduce){
@@ -496,16 +430,16 @@
 
   <div class="wrap">
     <header>
-      <a class="brand" href="index.html">
+      <a class="brand" href="/">
         <span class="brand-logo" aria-hidden="true"></span>
         <span class="brand-title">Kalan Computer Entertainment of America</span>
       </a>
 
       <nav aria-label="Main navigation">
-        <a href="index.html">Home</a>
-        <a href="projects.html">Projects</a>
-        <a href="devlog.html" aria-current="page">Devlog</a>
-        <a href="about.html">About</a>
+        <a href="/">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/devlog.html" aria-current="page">Devlog</a>
+        <a href="/about.html">About</a>
       </nav>
     </header>
 
@@ -519,7 +453,6 @@
         </p>
       </section>
 
-      <!-- Optional project-status strip. -->
       <section class="status-strip" aria-label="Current project status">
         <div class="status-item">
           <span class="status-label">Current Phase</span>
@@ -533,150 +466,26 @@
 
         <div class="status-item">
           <span class="status-label">Latest Update</span>
-          <span class="status-value">August 19, 2026</span>
+          <span id="latestUpdate" class="status-value">Loading…</span>
         </div>
       </section>
 
       <section aria-labelledby="latest-title">
         <div class="section-heading">
           <div>
-            <div class="eyebrow">Latest Entry</div>
-            <h2 id="latest-title">On the Bench</h2>
+            <div class="eyebrow">Devlog</div>
+            <h2 id="latest-title">Latest Updates</h2>
           </div>
           <p>Newest work first.</p>
         </div>
 
-        <!-- FEATURED / NEWEST DEVLOG ENTRY -->
-        <article class="featured">
-          <div class="featured-copy">
-            <div class="post-number">Devlog #018</div>
-            <h3>The Dev Cart Is Becoming Real Hardware</h3>
-
-            <p>
-              The cartridge architecture is moving out of KiCad and toward bench testing.
-              NOR flash, SRAM, bus isolation, USB programming, and the RP2040 control path
-              are being broken into pieces that can be tested independently before the final
-              board goes to fabrication.
-            </p>
-
-            <div class="meta">
-              <span>August 19, 2026</span>
-              <span>8 min read</span>
-              <span>Hardware</span>
-            </div>
-
-            <div class="tag-row">
-              <span class="tag">SANo</span>
-              <span class="tag">Dev Cart</span>
-              <span class="tag">KiCad</span>
-              <span class="tag">RP2040</span>
-            </div>
+        <div id="devlogList" class="devlog-list" aria-live="polite">
+          <div class="load-state">
+            <strong>Loading devlog…</strong>
+            Reading the newest updates from /media/devlog/.
           </div>
-
-          <aside class="featured-side">
-            <span class="milestone-label">Current Milestone</span>
-            <p class="milestone-value">Bench-test the cartridge buses before PCB fabrication.</p>
-            <div class="progress" aria-label="Milestone progress">
-              <span></span>
-            </div>
-          </aside>
-        </article>
-      </section>
-
-      <section aria-labelledby="archive-title">
-        <div class="section-heading">
-          <div>
-            <div class="eyebrow">Archive</div>
-            <h2 id="archive-title">Earlier Updates</h2>
-          </div>
-          <p>Duplicate an entry block for each new post.</p>
-        </div>
-
-        <div class="entries">
-
-          <!-- DEVLOG ENTRY TEMPLATE -->
-          <article class="entry">
-            <div class="entry-date">
-              <strong>August 14</strong>
-              2026<br>
-              Devlog #017
-            </div>
-
-            <div>
-              <h3>NOR Flash and SRAM Selected</h3>
-              <p>
-                Finalized the current bench parts for the development cartridge and ordered
-                breakout hardware so each memory device can be exercised independently.
-              </p>
-
-              <ul>
-                <li>MX29LV320 parallel NOR flash selected.</li>
-                <li>CY62177 SRAM selected for the working-memory path.</li>
-                <li>Breakout adapters ordered for bench validation.</li>
-              </ul>
-
-              <div class="tag-row">
-                <span class="tag">Hardware</span>
-                <span class="tag">Memory</span>
-                <span class="tag">Prototype</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="entry">
-            <div class="entry-date">
-              <strong>August 8</strong>
-              2026<br>
-              Devlog #016
-            </div>
-
-            <div>
-              <h3>Custom SANo Cartridge Edge in KiCad</h3>
-              <p>
-                Built the custom 2×30 cartridge-edge footprint and started routing the
-                development cartridge around the real console connector instead of a generic
-                placeholder.
-              </p>
-
-              <div class="tag-row">
-                <span class="tag">KiCad</span>
-                <span class="tag">PCB</span>
-                <span class="tag">Cartridge</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="entry">
-            <div class="entry-date">
-              <strong>July 2026</strong>
-              FPGA Bring-up<br>
-              Devlog #015
-            </div>
-
-            <div>
-              <h3>HDMI Output and Moving Graphics</h3>
-              <p>
-                Early FPGA bring-up moved from basic video output to persistent test graphics
-                and simple motion, giving the rendering pipeline a stable base for controller
-                input and later graphics work.
-              </p>
-
-              <div class="tag-row">
-                <span class="tag">FPGA</span>
-                <span class="tag">Video</span>
-                <span class="tag">RB3D</span>
-              </div>
-            </div>
-          </article>
-
         </div>
       </section>
-
-      <div class="template-note">
-        <strong>Template use:</strong> copy one <code>&lt;article class="entry"&gt;</code>
-        block whenever you add a new development update. The newest or most important update
-        can be promoted into the larger featured card above.
-      </div>
     </main>
 
     <footer>
@@ -687,72 +496,271 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    const DEVLOG_ROOT = "/media/devlog";
+    const DEVLOG_LIMIT = 5;
+
+    function parseFolderDate(folderName){
+      if(!/^\d{8}$/.test(folderName)) return null;
+
+      const day = Number(folderName.slice(0,2));
+      const month = Number(folderName.slice(2,4));
+      const year = Number(folderName.slice(4,8));
+      const date = new Date(year, month - 1, day);
+
+      if(
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ){
+        return null;
+      }
+
+      return date;
+    }
+
+    function formatFolderDate(folderName){
+      const date = parseFolderDate(folderName);
+      if(!date) return folderName;
+
+      return new Intl.DateTimeFormat("en-US", {
+        month:"long",
+        day:"numeric",
+        year:"numeric"
+      }).format(date);
+    }
+
+    function createTextElement(tagName, className, text){
+      const element = document.createElement(tagName);
+      if(className) element.className = className;
+      element.textContent = text ?? "";
+      return element;
+    }
+
+    function createDevlogCard(folderName, content){
+      const article = document.createElement("article");
+      article.className = "devlog-card";
+      article.dataset.devlogDate = folderName;
+
+      const copy = document.createElement("div");
+      copy.className = "card-copy";
+
+      copy.appendChild(
+        createTextElement("div", "card-date", formatFolderDate(folderName))
+      );
+
+      copy.appendChild(
+        createTextElement("h3", "card-title", content.header || "Untitled Update")
+      );
+
+      copy.appendChild(
+        createTextElement("p", "card-description", content.description || "")
+      );
+
+      const metaValues = [];
+      if(content.category) metaValues.push(content.category);
+      if(content.readTime) metaValues.push(content.readTime);
+
+      if(metaValues.length){
+        const meta = document.createElement("div");
+        meta.className = "card-meta";
+
+        for(const value of metaValues){
+          meta.appendChild(createTextElement("span", "", value));
+        }
+
+        copy.appendChild(meta);
+      }
+
+      if(Array.isArray(content.tags) && content.tags.length){
+        const tags = document.createElement("div");
+        tags.className = "tag-row";
+
+        for(const tagName of content.tags){
+          tags.appendChild(createTextElement("span", "tag", tagName));
+        }
+
+        copy.appendChild(tags);
+      }
+
+      const media = document.createElement("div");
+      media.className = "card-media";
+
+      const video = document.createElement("video");
+      video.className = "card-video";
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.setAttribute("aria-hidden", "true");
+
+      const source = document.createElement("source");
+      source.src = `${DEVLOG_ROOT}/${folderName}/banner.mp4`;
+      source.type = "video/mp4";
+      video.appendChild(source);
+
+      /* If a banner is missing or cannot play, the styled background remains visible. */
+      video.addEventListener("error", () => video.remove());
+
+      const banner = content.banner || {};
+      const bannerCopy = document.createElement("div");
+      bannerCopy.className = "banner-copy";
+
+      bannerCopy.appendChild(
+        createTextElement("span", "banner-label", banner.header || "Current Milestone")
+      );
+
+      bannerCopy.appendChild(
+        createTextElement("p", "banner-text", banner.text || "")
+      );
+
+      media.appendChild(video);
+      media.appendChild(bannerCopy);
+
+      article.appendChild(copy);
+      article.appendChild(media);
+
+      return article;
+    }
+
+    async function loadDevlog(){
+      const list = document.getElementById("devlogList");
+      const latestUpdate = document.getElementById("latestUpdate");
+
+      try{
+        const manifestResponse = await fetch(`${DEVLOG_ROOT}/index.json`, {
+          cache:"no-store"
+        });
+
+        if(!manifestResponse.ok){
+          throw new Error(`index.json returned HTTP ${manifestResponse.status}`);
+        }
+
+        const manifest = await manifestResponse.json();
+        const rawEntries = Array.isArray(manifest) ? manifest : manifest.entries;
+
+        if(!Array.isArray(rawEntries)){
+          throw new Error("index.json must be an array or contain an entries array.");
+        }
+
+        const newestFolders = rawEntries
+          .filter(folder => typeof folder === "string" && parseFolderDate(folder))
+          .sort((a,b) => parseFolderDate(b) - parseFolderDate(a))
+          .slice(0, DEVLOG_LIMIT);
+
+        if(!newestFolders.length){
+          throw new Error("No valid DDMMYYYY devlog folders were found in index.json.");
+        }
+
+        latestUpdate.textContent = formatFolderDate(newestFolders[0]);
+
+        const loadedEntries = await Promise.all(
+          newestFolders.map(async folderName => {
+            try{
+              const response = await fetch(
+                `${DEVLOG_ROOT}/${folderName}/PageContent.json`,
+                {cache:"no-store"}
+              );
+
+              if(!response.ok){
+                throw new Error(`HTTP ${response.status}`);
+              }
+
+              return {
+                folderName,
+                content:await response.json()
+              };
+            }catch(error){
+              console.error(`Could not load devlog entry ${folderName}:`, error);
+              return null;
+            }
+          })
+        );
+
+        list.replaceChildren();
+
+        for(const entry of loadedEntries){
+          if(entry){
+            list.appendChild(createDevlogCard(entry.folderName, entry.content));
+          }
+        }
+
+        if(!list.children.length){
+          throw new Error("The manifest loaded, but none of the five newest entries could be read.");
+        }
+      }catch(error){
+        console.error("Devlog load failed:", error);
+
+        const state = document.createElement("div");
+        state.className = "load-state";
+        state.appendChild(createTextElement("strong", "", "Devlog unavailable"));
+        state.appendChild(
+          document.createTextNode(
+            " Check /media/devlog/index.json and each entry's PageContent.json file."
+          )
+        );
+        list.replaceChildren(state);
+        latestUpdate.textContent = "Unavailable";
+      }
+    }
+
+    loadDevlog();
+
     (function createControllerField(){
       const controllerImages = [
-        "Controller_Profile_00FFF0.svg",
-        "Controller_Profile_4E45E8.svg",
-        "Controller_Profile_EFBF04.svg"
+        "/docs/Controller_Profile_00FFF0.svg",
+        "/docs/Controller_Profile_4E45E8.svg",
+        "/docs/Controller_Profile_EFBF04.svg"
       ];
 
       const field = document.getElementById("controllerField");
-      const isMobile = window.matchMedia("(max-width:800px)").matches;
+      const isMobile = window.matchMedia("(max-width:850px)").matches;
       const reducedMotion = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
       const controllerCount = isMobile ? 7 : 16;
-      const random = (min, max) => Math.random() * (max - min) + min;
-      const randomSigned = (min, max) =>
-        random(min, max) * (Math.random() < 0.5 ? -1 : 1);
+      const random = (min,max) => Math.random() * (max - min) + min;
+      const randomSigned = (min,max) => random(min,max) * (Math.random() < .5 ? -1 : 1);
 
       for(let i = 0; i < controllerCount; i++){
         const controller = document.createElement("img");
-        const baseSize = random(62, 170);
-        const duration = random(10, 22);
+        const baseSize = random(62,170);
+        const duration = random(10,22);
 
         controller.className = "floating-controller";
-        controller.src =
-          controllerImages[Math.floor(Math.random() * controllerImages.length)];
+        controller.src = controllerImages[Math.floor(Math.random() * controllerImages.length)];
         controller.alt = "";
-        controller.setAttribute("aria-hidden", "true");
+        controller.setAttribute("aria-hidden","true");
         controller.decoding = "async";
         controller.draggable = false;
 
-        controller.style.left = random(-8, 96) + "%";
-        controller.style.top = random(-6, 96) + "%";
-
+        controller.style.left = random(-8,96) + "%";
+        controller.style.top = random(-6,96) + "%";
         controller.style.setProperty(
           "--size",
-          `clamp(${Math.round(baseSize * 0.72)}px, ${(baseSize / 12).toFixed(2)}vw, ${Math.round(baseSize)}px)`
+          `clamp(${Math.round(baseSize*.72)}px, ${(baseSize/12).toFixed(2)}vw, ${Math.round(baseSize)}px)`
         );
-
         controller.style.setProperty("--duration", duration.toFixed(2) + "s");
-        controller.style.setProperty("--delay", (-random(0, duration)).toFixed(2) + "s");
-
-        controller.style.setProperty("--x1", randomSigned(18, 62).toFixed(1) + "px");
-        controller.style.setProperty("--y1", randomSigned(18, 58).toFixed(1) + "px");
-        controller.style.setProperty("--x2", randomSigned(34, 92).toFixed(1) + "px");
-        controller.style.setProperty("--y2", randomSigned(32, 88).toFixed(1) + "px");
-        controller.style.setProperty("--x3", randomSigned(15, 74).toFixed(1) + "px");
-        controller.style.setProperty("--y3", randomSigned(22, 76).toFixed(1) + "px");
-
-        controller.style.setProperty("--rotation-start", random(-28, 28).toFixed(1) + "deg");
-        controller.style.setProperty("--rotation-mid", random(-34, 34).toFixed(1) + "deg");
-        controller.style.setProperty("--rotation-late", random(-38, 38).toFixed(1) + "deg");
-        controller.style.setProperty("--rotation-end", random(-30, 30).toFixed(1) + "deg");
-
-        controller.style.setProperty("--scale-start", random(0.62, 0.88).toFixed(2));
-        controller.style.setProperty("--scale-mid", random(0.78, 1.16).toFixed(2));
-        controller.style.setProperty("--scale-late", random(0.68, 1.28).toFixed(2));
-        controller.style.setProperty("--scale-end", random(0.74, 1.20).toFixed(2));
+        controller.style.setProperty("--delay", (-random(0,duration)).toFixed(2) + "s");
+        controller.style.setProperty("--x1", randomSigned(18,62).toFixed(1) + "px");
+        controller.style.setProperty("--y1", randomSigned(18,58).toFixed(1) + "px");
+        controller.style.setProperty("--x2", randomSigned(34,92).toFixed(1) + "px");
+        controller.style.setProperty("--y2", randomSigned(32,88).toFixed(1) + "px");
+        controller.style.setProperty("--x3", randomSigned(15,74).toFixed(1) + "px");
+        controller.style.setProperty("--y3", randomSigned(22,76).toFixed(1) + "px");
+        controller.style.setProperty("--rotation-start", random(-28,28).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-mid", random(-34,34).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-late", random(-38,38).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-end", random(-30,30).toFixed(1) + "deg");
+        controller.style.setProperty("--scale-start", random(.62,.88).toFixed(2));
+        controller.style.setProperty("--scale-mid", random(.78,1.16).toFixed(2));
+        controller.style.setProperty("--scale-late", random(.68,1.28).toFixed(2));
+        controller.style.setProperty("--scale-end", random(.74,1.20).toFixed(2));
 
         if(reducedMotion){
           controller.style.animation = "none";
-          controller.style.transform =
-            `rotate(${random(-25,25).toFixed(1)}deg) scale(${random(0.7,1.05).toFixed(2)})`;
+          controller.style.transform = `rotate(${random(-25,25).toFixed(1)}deg) scale(${random(.7,1.05).toFixed(2)})`;
         }
 
-        controller.addEventListener("error", function(){
-          controller.remove();
-        });
-
+        controller.addEventListener("error", () => controller.remove());
         field.appendChild(controller);
       }
     })();
