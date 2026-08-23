@@ -302,17 +302,53 @@
       box-shadow:0 16px 40px rgba(0,0,0,.34);
     }
 
-    .back-link{
-      display:inline-flex;
+    .entry-nav{
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
       align-items:center;
-      gap:8px;
-      margin-top:48px;
+      gap:18px;
+      width:100%;
+      margin-top:54px;
+      padding-top:24px;
+      border-top:1px solid var(--line);
+    }
+
+    .entry-nav-link{
       color:var(--accent);
       font-weight:700;
       text-decoration:none;
+      transition:color .18s ease;
     }
 
-    .back-link:hover{color:var(--ink)}
+    .entry-nav-link:hover{color:var(--ink)}
+
+    .entry-nav-link:focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:4px;
+      border-radius:6px;
+    }
+
+    .entry-nav-prev{
+      justify-self:start;
+      text-align:left;
+    }
+
+    .entry-nav-back{
+      justify-self:center;
+      text-align:center;
+    }
+
+    .entry-nav-next{
+      justify-self:end;
+      text-align:right;
+    }
+
+    .entry-nav-disabled{
+      color:var(--dim);
+      font-weight:700;
+      opacity:.45;
+      cursor:default;
+    }
 
     .load-state{
       width:min(800px,100%);
@@ -352,6 +388,26 @@
       .hero-video{min-height:260px}
       .article-image-wrap,
       .article-video-wrap{width:100%; margin-left:0; margin-right:0; transform:none}
+
+      .entry-nav{
+        grid-template-columns:1fr 1fr;
+        row-gap:20px;
+      }
+
+      .entry-nav-back{
+        grid-column:1 / -1;
+        grid-row:1;
+      }
+
+      .entry-nav-prev{
+        grid-column:1;
+        grid-row:2;
+      }
+
+      .entry-nav-next{
+        grid-column:2;
+        grid-row:2;
+      }
     }
 
     @media (prefers-reduced-motion:reduce){
@@ -528,7 +584,7 @@
       }
     }
 
-    function buildEntry(folderName, content){
+    function buildEntry(folderName, content, neighbors = {}){
       const shell = document.createElement("article");
       shell.className = "entry-shell";
 
@@ -623,13 +679,80 @@
 
       shell.appendChild(body);
 
+      const entryNav = document.createElement("nav");
+      entryNav.className = "entry-nav";
+      entryNav.setAttribute("aria-label", "Devlog entry navigation");
+
+      if(neighbors.previous){
+        const previous = document.createElement("a");
+        previous.className = "entry-nav-link entry-nav-prev";
+        previous.href = `/devlog/devlog-entry.html?date=${encodeURIComponent(neighbors.previous)}`;
+        previous.textContent = "← Previous Entry";
+        entryNav.appendChild(previous);
+      }else{
+        const previous = createTextElement("span", "entry-nav-prev entry-nav-disabled", "← Previous Entry");
+        previous.setAttribute("aria-disabled", "true");
+        entryNav.appendChild(previous);
+      }
+
       const back = document.createElement("a");
-      back.className = "back-link";
+      back.className = "entry-nav-link entry-nav-back";
       back.href = "/devlog/devlog.html";
-      back.textContent = "← Back to Devlog";
-      shell.appendChild(back);
+      back.textContent = "Back to Devlog";
+      entryNav.appendChild(back);
+
+      if(neighbors.next){
+        const next = document.createElement("a");
+        next.className = "entry-nav-link entry-nav-next";
+        next.href = `/devlog/devlog-entry.html?date=${encodeURIComponent(neighbors.next)}`;
+        next.textContent = "Next Entry →";
+        entryNav.appendChild(next);
+      }else{
+        const next = createTextElement("span", "entry-nav-next entry-nav-disabled", "Next Entry →");
+        next.setAttribute("aria-disabled", "true");
+        entryNav.appendChild(next);
+      }
+
+      shell.appendChild(entryNav);
 
       return shell;
+    }
+
+    async function getEntryNeighbors(folderName){
+      try{
+        const response = await fetch(`${DEVLOG_ROOT}/index.json`, {cache:"no-store"});
+
+        if(!response.ok){
+          throw new Error(`index.json returned HTTP ${response.status}`);
+        }
+
+        const manifest = await response.json();
+        const rawEntries = Array.isArray(manifest) ? manifest : manifest.entries;
+
+        if(!Array.isArray(rawEntries)){
+          throw new Error("index.json must be an array or contain an entries array.");
+        }
+
+        // Oldest -> newest, so Previous is chronologically older
+        // and Next is chronologically newer.
+        const folders = rawEntries
+          .filter(folder => typeof folder === "string" && parseFolderDate(folder))
+          .sort((a,b) => parseFolderDate(a) - parseFolderDate(b));
+
+        const currentIndex = folders.indexOf(folderName);
+
+        if(currentIndex === -1){
+          return {previous:null, next:null};
+        }
+
+        return {
+          previous: currentIndex > 0 ? folders[currentIndex - 1] : null,
+          next: currentIndex < folders.length - 1 ? folders[currentIndex + 1] : null
+        };
+      }catch(error){
+        console.error("Could not load devlog navigation:", error);
+        return {previous:null, next:null};
+      }
     }
 
     async function loadEntry(){
@@ -657,9 +780,10 @@
         }
 
         const content = await response.json();
+        const neighbors = await getEntryNeighbors(folderName);
 
         document.title = `${content.header || "Devlog Entry"} — KCEA`;
-        pageMain.replaceChildren(buildEntry(folderName, content));
+        pageMain.replaceChildren(buildEntry(folderName, content, neighbors));
       }catch(error){
         console.error("Devlog entry load failed:", error);
 
