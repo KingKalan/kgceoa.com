@@ -16,9 +16,11 @@
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:type" content="image/png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg:#0b0f1a;
@@ -26,19 +28,26 @@
       --panel-2:#111a2b;
       --ink:#e7ecf7;
       --muted:#9fb2d9;
+      --dim:#7182a5;
       --accent:#5fd4ff;
       --accent-2:#8a7dff;
+      --gold:#efbf04;
       --radius:22px;
       --shadow:0 10px 24px rgba(0,0,0,.35),0 2px 0 rgba(255,255,255,.025) inset;
+      --line:rgba(255,255,255,.07);
     }
 
     *{box-sizing:border-box}
 
-    html{scroll-behavior:smooth}
+    html{
+      min-height:100%;
+      scroll-behavior:smooth;
+    }
 
     body{
       margin:0;
       min-height:100vh;
+      overflow-x:hidden;
       background:
         radial-gradient(1100px 600px at 85% -10%, rgba(138,125,255,.24), transparent 62%),
         radial-gradient(900px 500px at 10% 105%, rgba(95,212,255,.18), transparent 62%),
@@ -47,7 +56,73 @@
       font-family:Inter,system-ui,sans-serif;
     }
 
+    /* Floating controller artwork behind the page. */
+    .controller-field{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      overflow:hidden;
+      pointer-events:none;
+      isolation:isolate;
+    }
+
+    .controller-field::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:2;
+      background:rgba(11,15,26,.27);
+    }
+
+    .floating-controller{
+      position:absolute;
+      z-index:1;
+      display:block;
+      width:var(--size);
+      height:auto;
+      max-width:none;
+      opacity:.48;
+      pointer-events:none;
+      user-select:none;
+      -webkit-user-drag:none;
+      animation:bubble-drift var(--duration) ease-in-out var(--delay) infinite alternate;
+      transform-origin:center;
+      contain:layout paint;
+    }
+
+    @keyframes bubble-drift{
+      0%{
+        transform:
+          translate3d(0,0,0)
+          rotate(var(--rotation-start))
+          scale(var(--scale-start));
+      }
+
+      33%{
+        transform:
+          translate3d(var(--x1),var(--y1),0)
+          rotate(var(--rotation-mid))
+          scale(var(--scale-mid));
+      }
+
+      66%{
+        transform:
+          translate3d(var(--x2),var(--y2),0)
+          rotate(var(--rotation-late))
+          scale(var(--scale-late));
+      }
+
+      100%{
+        transform:
+          translate3d(var(--x3),var(--y3),0)
+          rotate(var(--rotation-end))
+          scale(var(--scale-end));
+      }
+    }
+
     .wrap{
+      position:relative;
+      z-index:3;
       max-width:1100px;
       margin-inline:auto;
       padding:24px clamp(16px,3.5vw,48px) 56px;
@@ -88,22 +163,24 @@
       align-items:center;
       flex-wrap:wrap;
       justify-content:flex-end;
+      gap:18px;
     }
 
     nav a{
       color:var(--muted);
       text-decoration:none;
       font-weight:600;
-      margin-left:18px;
     }
 
-    nav a:hover{color:var(--ink)}
+    nav a:hover,
+    nav a[aria-current="page"]{
+      color:var(--ink);
+    }
 
     .hero{
-      min-height:58vh;
       display:grid;
       align-content:center;
-      padding:72px 0 54px;
+      padding:72px 0 58px;
     }
 
     .eyebrow{
@@ -132,33 +209,18 @@
       margin:24px 0 0;
     }
 
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:30px;
+    .hero-news{
+      width:100%;
+      margin-top:34px;
     }
 
-    .button{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:13px 18px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:800;
-      color:#0b0f1a;
-      background:linear-gradient(90deg,var(--accent),var(--accent-2));
-      border:1px solid rgba(255,255,255,.15);
+    .hero-news-heading{
+      margin-bottom:12px;
     }
 
-    .button.secondary{
-      color:var(--ink);
-      background:rgba(255,255,255,.025);
-      border-color:rgba(255,255,255,.15);
+    .hero-news-heading .eyebrow{
+      margin:0;
     }
-
-    .button:hover{transform:translateY(-1px)}
 
     .section-title{
       font-family:Unbounded,sans-serif;
@@ -192,6 +254,7 @@
       text-decoration:none;
       border:1px solid rgba(255,255,255,.04);
       transition:transform .18s ease,border-color .18s ease;
+      backdrop-filter:blur(8px);
     }
 
     .card:hover{
@@ -220,6 +283,172 @@
       margin:0;
     }
 
+    .devlog-card{
+      display:grid;
+      grid-template-columns:minmax(0,1.7fr) minmax(300px,.95fr);
+      min-height:310px;
+      overflow:hidden;
+      border:1px solid rgba(95,212,255,.14);
+      border-radius:var(--radius);
+      color:inherit;
+      text-decoration:none;
+      background:linear-gradient(135deg,rgba(15,21,36,.96),rgba(17,26,43,.92));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+    }
+
+    .devlog-card:hover{
+      transform:translateY(-3px);
+      border-color:rgba(95,212,255,.38);
+      box-shadow:0 16px 34px rgba(0,0,0,.42),0 2px 0 rgba(255,255,255,.025) inset;
+    }
+
+    .devlog-card:focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:4px;
+    }
+
+    .devlog-copy{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-width:0;
+      padding:clamp(28px,4vw,42px);
+    }
+
+    .devlog-date{
+      margin-bottom:12px;
+      color:var(--accent);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+    }
+
+    .devlog-title{
+      max-width:17ch;
+      margin:0 0 15px;
+      font-family:Unbounded,sans-serif;
+      font-size:clamp(26px,3.8vw,40px);
+      line-height:1.12;
+    }
+
+    .devlog-description{
+      max-width:64ch;
+      margin:0;
+      color:var(--muted);
+      font-size:clamp(15px,1.5vw,17px);
+      line-height:1.7;
+    }
+
+    .devlog-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 18px;
+      margin-top:22px;
+      color:var(--dim);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .tag-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:16px;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      min-height:27px;
+      padding:0 10px;
+      border:1px solid rgba(95,212,255,.18);
+      border-radius:999px;
+      color:#ccefff;
+      background:rgba(95,212,255,.07);
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+
+    .devlog-media{
+      position:relative;
+      min-height:310px;
+      overflow:hidden;
+      border-left:1px solid var(--line);
+      background:
+        radial-gradient(circle at 75% 12%,rgba(138,125,255,.22),transparent 38%),
+        #0c1220;
+    }
+
+    .devlog-video{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      background:#0c1220;
+    }
+
+    .devlog-media::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      background:
+        linear-gradient(180deg,rgba(5,9,17,.08) 0%,rgba(5,9,17,.22) 42%,rgba(5,9,17,.90) 100%),
+        linear-gradient(90deg,rgba(5,9,17,.08),transparent 30%);
+      pointer-events:none;
+    }
+
+    .banner-copy{
+      position:absolute;
+      z-index:2;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:clamp(22px,3vw,30px);
+    }
+
+    .banner-label{
+      display:block;
+      margin-bottom:8px;
+      color:var(--gold);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .banner-text{
+      margin:0;
+      color:#dce6ff;
+      font-family:Unbounded,sans-serif;
+      font-size:clamp(17px,2vw,23px);
+      font-weight:700;
+      line-height:1.4;
+      text-shadow:0 2px 14px rgba(0,0,0,.48);
+    }
+
+    .load-state{
+      padding:26px;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      color:var(--muted);
+      background:rgba(15,21,36,.80);
+      box-shadow:var(--shadow);
+    }
+
+    .load-state strong{
+      display:block;
+      margin-bottom:6px;
+      color:var(--ink);
+      font-family:Unbounded,sans-serif;
+    }
+
     footer{
       margin-top:52px;
       padding-top:22px;
@@ -228,24 +457,53 @@
       font-size:12px;
     }
 
+    @media (max-width:820px){
+      .devlog-card{
+        grid-template-columns:1fr;
+      }
+
+      .devlog-media{
+        min-height:300px;
+        border-top:1px solid var(--line);
+        border-left:0;
+      }
+
+      .devlog-title{max-width:none}
+    }
+
     @media (max-width:760px){
       header{
         align-items:flex-start;
         flex-direction:column;
       }
 
-      nav a{
-        margin:0 18px 0 0;
+      nav{
+        justify-content:flex-start;
       }
 
       .hero{
         min-height:auto;
         padding:64px 0 50px;
       }
+
+      .devlog-section-heading{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .floating-controller{animation:none}
+      .card,
+      .devlog-card{transition:none}
     }
   </style>
 </head>
+
 <body>
+  <div id="controllerField" class="controller-field" aria-hidden="true"></div>
+
   <div class="wrap">
     <header>
       <a class="brand" href="landing.html">
@@ -256,6 +514,7 @@
       <nav aria-label="Primary navigation">
         <a href="landing.html" aria-current="page">Home</a>
         <a href="projects.html">Projects</a>
+        <a href="/devlog/devlog.html">Devlog</a>
         <a href="about.html">About</a>
       </nav>
     </header>
@@ -270,9 +529,17 @@
           spirit of physical entertainment.
         </p>
 
-        <div class="actions">
-          <a class="button" href="projects.html">Explore Projects</a>
-          <a class="button secondary" href="model_viewer.html">Open Controller Configurator</a>
+        <div class="hero-news">
+          <div class="hero-news-heading">
+            <span class="eyebrow">Latest News</span>
+          </div>
+
+          <div id="latestDevlog">
+            <div class="load-state">
+              <strong>Loading latest update…</strong>
+              Reading the newest entry from /media/devlog/.
+            </div>
+          </div>
         </div>
       </section>
 
@@ -293,6 +560,12 @@
             <p>Open the 3D viewer, select controller parts, choose colors, and save or email the project.</p>
           </a>
 
+          <a class="card" href="/devlog/devlog.html">
+            <span class="card-kicker">Development</span>
+            <h2>Devlog</h2>
+            <p>Follow SANo hardware, software, manufacturing, prototypes, failures, fixes, and milestones as they happen.</p>
+          </a>
+
           <a class="card" href="about.html">
             <span class="card-kicker">Company</span>
             <h2>About KCEA</h2>
@@ -300,6 +573,7 @@
           </a>
         </div>
       </section>
+
     </main>
 
     <footer>
@@ -309,6 +583,271 @@
 
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
+
+    const DEVLOG_ROOT = "/media/devlog";
+
+    function parseFolderDate(folderName){
+      if(!/^\d{8}$/.test(folderName)) return null;
+
+      const day = Number(folderName.slice(0,2));
+      const month = Number(folderName.slice(2,4));
+      const year = Number(folderName.slice(4,8));
+      const date = new Date(year,month - 1,day);
+
+      if(
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ){
+        return null;
+      }
+
+      return date;
+    }
+
+    function formatFolderDate(folderName){
+      const date = parseFolderDate(folderName);
+      if(!date) return folderName;
+
+      return new Intl.DateTimeFormat("en-US",{
+        month:"long",
+        day:"numeric",
+        year:"numeric"
+      }).format(date);
+    }
+
+    function createTextElement(tagName,className,text){
+      const element = document.createElement(tagName);
+      if(className) element.className = className;
+      element.textContent = text ?? "";
+      return element;
+    }
+
+    function createLatestDevlogCard(folderName,content){
+      const card = document.createElement("a");
+      card.className = "devlog-card";
+      card.href = `/devlog/devlog-entry.html?date=${encodeURIComponent(folderName)}`;
+      card.setAttribute(
+        "aria-label",
+        `Open latest devlog entry: ${content.header || "Untitled Update"}`
+      );
+
+      const copy = document.createElement("div");
+      copy.className = "devlog-copy";
+
+      copy.appendChild(
+        createTextElement("div","devlog-date",formatFolderDate(folderName))
+      );
+
+      copy.appendChild(
+        createTextElement("h3","devlog-title",content.header || "Untitled Update")
+      );
+
+      copy.appendChild(
+        createTextElement("p","devlog-description",content.description || "")
+      );
+
+      const metaValues = [];
+      if(content.category) metaValues.push(content.category);
+      if(content.readTime) metaValues.push(content.readTime);
+
+      if(metaValues.length){
+        const meta = document.createElement("div");
+        meta.className = "devlog-meta";
+
+        for(const value of metaValues){
+          meta.appendChild(createTextElement("span","",value));
+        }
+
+        copy.appendChild(meta);
+      }
+
+      if(Array.isArray(content.tags) && content.tags.length){
+        const tags = document.createElement("div");
+        tags.className = "tag-row";
+
+        for(const tagName of content.tags){
+          tags.appendChild(createTextElement("span","tag",tagName));
+        }
+
+        copy.appendChild(tags);
+      }
+
+      const media = document.createElement("div");
+      media.className = "devlog-media";
+
+      const video = document.createElement("video");
+      video.className = "devlog-video";
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.setAttribute("aria-hidden","true");
+
+      const source = document.createElement("source");
+      source.src = `${DEVLOG_ROOT}/${folderName}/banner.mp4`;
+      source.type = "video/mp4";
+      video.appendChild(source);
+
+      video.addEventListener("error",() => video.remove());
+
+      const banner = content.banner || {};
+      const bannerCopy = document.createElement("div");
+      bannerCopy.className = "banner-copy";
+
+      bannerCopy.appendChild(
+        createTextElement("span","banner-label",banner.header || "Current Milestone")
+      );
+
+      bannerCopy.appendChild(
+        createTextElement("p","banner-text",banner.text || "")
+      );
+
+      media.appendChild(video);
+      media.appendChild(bannerCopy);
+
+      card.appendChild(copy);
+      card.appendChild(media);
+
+      return card;
+    }
+
+    async function loadLatestDevlog(){
+      const container = document.getElementById("latestDevlog");
+
+      try{
+        const manifestResponse = await fetch(`${DEVLOG_ROOT}/index.json`,{
+          cache:"no-store"
+        });
+
+        if(!manifestResponse.ok){
+          throw new Error(`index.json returned HTTP ${manifestResponse.status}`);
+        }
+
+        const manifest = await manifestResponse.json();
+        const rawEntries = Array.isArray(manifest) ? manifest : manifest.entries;
+
+        if(!Array.isArray(rawEntries)){
+          throw new Error("index.json must be an array or contain an entries array.");
+        }
+
+        const folders = rawEntries
+          .filter(folder => typeof folder === "string" && parseFolderDate(folder))
+          .sort((a,b) => parseFolderDate(b) - parseFolderDate(a));
+
+        if(!folders.length){
+          throw new Error("No valid DDMMYYYY devlog folders found.");
+        }
+
+        /*
+          Try entries newest-first until one valid PageContent.json loads.
+          This prevents one broken newest JSON file from removing the entire
+          homepage devlog section.
+        */
+        for(const folderName of folders){
+          try{
+            const response = await fetch(
+              `${DEVLOG_ROOT}/${folderName}/PageContent.json`,
+              {cache:"no-store"}
+            );
+
+            if(!response.ok){
+              throw new Error(`HTTP ${response.status}`);
+            }
+
+            const content = await response.json();
+            container.replaceChildren(
+              createLatestDevlogCard(folderName,content)
+            );
+            return;
+          }catch(error){
+            console.error(`Could not load homepage devlog entry ${folderName}:`,error);
+          }
+        }
+
+        throw new Error("No valid devlog entries could be loaded.");
+      }catch(error){
+        console.error("Latest devlog load failed:",error);
+
+        const state = document.createElement("div");
+        state.className = "load-state";
+        state.appendChild(createTextElement("strong","","Latest update unavailable"));
+        state.appendChild(
+          document.createTextNode(
+            " Check /media/devlog/index.json and the newest PageContent.json file."
+          )
+        );
+
+        container.replaceChildren(state);
+      }
+    }
+
+    loadLatestDevlog();
+
+    (function createControllerField(){
+      const controllerImages = [
+        "/docs/Controller_Profile_00FFF0.svg",
+        "/docs/Controller_Profile_4E45E8.svg",
+        "/docs/Controller_Profile_EFBF04.svg"
+      ];
+
+      const field = document.getElementById("controllerField");
+      const isMobile = window.matchMedia("(max-width:760px)").matches;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+      const controllerCount = isMobile ? 8 : 20;
+      const random = (min,max) => Math.random() * (max - min) + min;
+      const randomSigned = (min,max) =>
+        random(min,max) * (Math.random() < .5 ? -1 : 1);
+
+      for(let i = 0; i < controllerCount; i++){
+        const controller = document.createElement("img");
+        const baseSize = random(62,170);
+        const duration = random(10,22);
+
+        controller.className = "floating-controller";
+        controller.src =
+          controllerImages[Math.floor(Math.random() * controllerImages.length)];
+        controller.alt = "";
+        controller.setAttribute("aria-hidden","true");
+        controller.decoding = "async";
+        controller.draggable = false;
+
+        controller.style.left = random(-8,96) + "%";
+        controller.style.top = random(-6,96) + "%";
+
+        controller.style.setProperty(
+          "--size",
+          `clamp(${Math.round(baseSize*.72)}px, ${(baseSize/12).toFixed(2)}vw, ${Math.round(baseSize)}px)`
+        );
+
+        controller.style.setProperty("--duration",duration.toFixed(2) + "s");
+        controller.style.setProperty("--delay",(-random(0,duration)).toFixed(2) + "s");
+        controller.style.setProperty("--x1",randomSigned(18,62).toFixed(1) + "px");
+        controller.style.setProperty("--y1",randomSigned(18,58).toFixed(1) + "px");
+        controller.style.setProperty("--x2",randomSigned(34,92).toFixed(1) + "px");
+        controller.style.setProperty("--y2",randomSigned(32,88).toFixed(1) + "px");
+        controller.style.setProperty("--x3",randomSigned(15,74).toFixed(1) + "px");
+        controller.style.setProperty("--y3",randomSigned(22,76).toFixed(1) + "px");
+        controller.style.setProperty("--rotation-start",random(-28,28).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-mid",random(-34,34).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-late",random(-38,38).toFixed(1) + "deg");
+        controller.style.setProperty("--rotation-end",random(-30,30).toFixed(1) + "deg");
+        controller.style.setProperty("--scale-start",random(.62,.88).toFixed(2));
+        controller.style.setProperty("--scale-mid",random(.78,1.16).toFixed(2));
+        controller.style.setProperty("--scale-late",random(.68,1.28).toFixed(2));
+        controller.style.setProperty("--scale-end",random(.74,1.20).toFixed(2));
+
+        if(reducedMotion){
+          controller.style.animation = "none";
+          controller.style.transform =
+            `rotate(${random(-25,25).toFixed(1)}deg) scale(${random(.7,1.05).toFixed(2)})`;
+        }
+
+        controller.addEventListener("error",() => controller.remove());
+        field.appendChild(controller);
+      }
+    })();
   </script>
 </body>
 </html>
