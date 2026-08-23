@@ -1,0 +1,45 @@
+{
+  "header": "Print Failures",
+  "description": "The Highlight Reel of some of my failed prints.",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Export Gerber files and have PCB manufactured."
+  },
+  "category": "Hardware",
+  "readTime": "11 min",
+  "tags": [
+	"Controller"
+	],
+"body": [
+
+"I finally got a decent transparent print after a few failures.",
+
+"[{image01.jpg}]",
+
+"I did a bit of post processing on half of this failed print as another print was going. Honestly, i think it turned out pretty well for how little i did do to it.",
+
+"[{image02.jpg}]",
+
+"Here you can see the issue i was having with the prints. one side would detach from the build plate and try to keep going.",
+
+"[{image03.jpg}]",
+
+"[{image05.jpg}]",
+
+"This is the orientation that the shell is being printed at.",
+
+"[{image04.jpg}]",
+
+ "This is a look inside of the resin tray while its printing.",
+
+"[{image06.jpg}]",
+
+"I finished a transparent print. Did a little bit of post processing to it. I did 2 passes of sanding, one at 400 grit and than a second at 600 grit. I finished with a clear coat from a rattle can.",
+
+"[{image09.jpg}]",
+"[{image07,jpg}]",
+"[{image08.jpg}]",
+"[{image10.jpg}]"
+
+]
+}
