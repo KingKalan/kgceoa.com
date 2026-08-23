@@ -1,0 +1,60 @@
+{
+  "header": "Mechanical Issues",
+  "description": "Still dealing with mechanical issues in the design of the controller.",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Locate and correct the source of the mechanical errors in the controller design."
+  },
+  "category": "Hardware",
+  "readTime": "11 min",
+  "tags": [
+	"Controller"
+	],
+"body": [
+
+"Some new updates to the mechanical errors. Not yet giving the performance I expect, but much closer and significantly less annoying... This orange resin is slightly problematic as it's not intended for functional parts like I'm using here. But I have more grey being delivered. I am able to use every button this time, albiet some issues described in the pictures. So this week I'll be testing the controller against The Legend of Zelda A Link to the Past on an emulator. The SNES doesn't allow for mapping controls like an emulator does, so I'll use the emulator to dial in the mechanical issues, then use actual hardware to test button mapping in the PCB. Once I confirm the mix up there, I'll order new PCB boards with the corrections.",
+
+"Seeing this in pictures is nothing compared to seeing Phrozen neon pumpkin resin curing in person.",
+
+"[{image01.jpg}]",
+
+"I determined these membranes under the DPad were the issue, their stroke is 1.5mm making issues connecting diagonal input.",
+
+"[{image02.jpg}]",
+
+"Because of the stroke of the membrane, I decided to reduce the depth of the standoff socket to pre-compress the membrane to a stroke of ~0.8mm.",
+
+"[{image03.jpg}]",
+
+"I removed the direction indicator recessed triangles on the face. I also ditched the 90⁰ angle of the side walls, and pushed the center of the DPad inward.",
+
+"[{image04.jpg}]",
+
+"Clearances on the previous version around the DPad large enough to prevent binding. Was nervous about it shifting far enough to miss contact. But, that wasn't the issue I faced on this design.",
+
+"[{image05.jpg}]",
+
+"[{image06.jpg}]",
+
+"[{image08.jpg}]",
+
+"I made a mistake of one letter in my Bill of Materials and the first run of PCB boards received a vertical JST connection. Rather than fight with it, just cut a hole for the vertical... The next run places a horizontal JST on the other side of the board.",
+
+"[{image09.jpg}]",
+
+"[{image10,jpg}]",
+
+"These are M2.3x12 screws that are supposed to hold the body together and position the PCB.",
+
+"[{image11.jpg}]",
+
+"These screws for this plastic doesn't work, it just strips the pipes and never grabs. Which is what I believe is causing the intermittent diagonal input. I have M2.6x12 coming this week. Hopefully the new screws will grab the body parts and properly fasten them and correct the flex that happens pressing buttons allowing for better diagonal input.",
+
+"[{image12.jpg}]",
+
+"Also this week I have dowel pins coming to replace the print in place hinge pins on the shoulder buttons. They landed in the United States 2 days ago and came with customs clearance paperwork so should be another couple of days before these are printed with the new design which accepts these pins.",
+
+"[{image13.jpg}]",
+
+]
+}
