@@ -1,10 +1,10 @@
 
 {
-  "header": "Whats going on",
-  "description": "just a little bit of whats going on",
+  "header": "Hardware selection",
+  "description": "Setting up the hardware configuration.",
   "banner": {
     "header": "Current Milestone",
-    "text": "finish the devlog"
+    "text": "Finalize the register map and hardware selection"
   },
   "category": "viewer",
   "readTime": "long enough",
@@ -13,7 +13,9 @@
 	],
 "body": [
 
-"Describe the image here."
+"A little mock up of the hardware.",
+
+"[{image01.jpg}]"
 
 
 ]
