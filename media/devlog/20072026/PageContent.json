@@ -1,10 +1,10 @@
 
 {
-  "header": "Whats going on",
-  "description": "just a little bit of whats going on",
+  "header": "PPU work",
+  "description": "Tinkering around with the FPGA that will become the PPU.",
   "banner": {
     "header": "Current Milestone",
-    "text": "finish the devlog"
+    "text": "Organize the hardware and document."
   },
   "category": "viewer",
   "readTime": "long enough",
@@ -13,9 +13,11 @@
 	],
 "body": [
 
-"Describe the image here."
+"A successfull flash on the FPGA.",
 
 "[{image01.jpg}]",
+
+"Placed a tile based logo into the PPU and had it bouncing like a DVD screensaver.",
 
 "[{video01.mp4}]"
 
