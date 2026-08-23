@@ -1,1 +1,23 @@
 
+{
+  "header": "Whats going on",
+  "description": "just a little bit of whats going on",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "finish the devlog"
+  },
+  "category": "viewer",
+  "readTime": "long enough",
+  "tags": [
+	"tag"
+	],
+"body": [
+
+"Describe the image here."
+
+"[{image01.jpg}]",
+
+"[{video01.mp4}]"
+
+]
+}
