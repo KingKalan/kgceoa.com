@@ -386,6 +386,33 @@
       text-shadow:0 2px 14px rgba(0,0,0,.48);
     }
 
+
+    .archive-link-row{
+      display:flex;
+      justify-content:center;
+      margin-top:28px;
+    }
+
+    .archive-link{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:13px 18px;
+      border:1px solid rgba(95,212,255,.18);
+      border-radius:999px;
+      color:var(--accent);
+      background:rgba(15,21,36,.78);
+      box-shadow:var(--shadow);
+      font-weight:800;
+      text-decoration:none;
+      backdrop-filter:blur(8px);
+    }
+
+    .archive-link:hover{
+      color:var(--ink);
+      border-color:rgba(95,212,255,.42);
+    }
+
     .load-state{
       padding:30px;
       border:1px solid var(--line);
@@ -454,6 +481,7 @@
         <a href="/">Home</a>
         <a href="/projects.html">Projects</a>
         <a href="/devlog.html" aria-current="page">Devlog</a>
+        <a href="/devlog/archive.html">Archive</a>
         <a href="/about.html">About</a>
       </nav>
     </header>
@@ -499,6 +527,10 @@
             <strong>Loading devlog…</strong>
             Reading the newest updates from /media/devlog/.
           </div>
+        </div>
+
+        <div class="archive-link-row">
+          <a class="archive-link" href="/devlog/archive.html">View Full Archive →</a>
         </div>
       </section>
     </main>
