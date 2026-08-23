@@ -1,20 +1,23 @@
 
 {
-  "header": "Whats going on",
-  "description": "just a little bit of whats going on",
+  "header": "Second iteration of PCB boards.",
+  "description": "Got my invoice and approval images today on the second iteration of the controller PCB.",
   "banner": {
     "header": "Current Milestone",
-    "text": "finish the devlog"
+    "text": "Waiting on new boards."
   },
-  "category": "viewer",
-  "readTime": "long enough",
+  "category": "Hardware",
+  "readTime": "2 min",
   "tags": [
 	"tag"
 	],
 "body": [
 
-"Describe the image here."
+"Got the invoice and approval images today. Won't be too much longer and I can see if the fixes applied actually fixed what they were supposed to.",
 
-
+[{image01.jpg}]",
+[{image02.jpg}]",
+[{image03.jpg}]",
+[{image04.jpg}]"
 ]
 }
