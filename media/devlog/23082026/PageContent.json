@@ -1,0 +1,42 @@
+{
+  "header": "DevLog and DevLog Archive are now live.",
+  "description": "Future posts about the development will be posted here, rather than on Facebook.",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Awaiting shipment of DevCart components."
+  },
+  "category": "Update",
+  "readTime": "2 min",
+  "tags": [
+	"WebPage"
+	],
+"body": [
+  "The KCEA Devlog has been rebuilt to make following development easier. This page will serve as the main place to keep up with current progress, older milestones, prototypes, failures, fixes, and everything in between.",
+
+  "The main Devlog page shows the five most recent updates. Each card gives a quick overview of the post, including the title, date, category, tags, and the current milestone being worked on.",
+
+  "[{image01.jpg}]",
+
+  "Clicking any devlog card opens the full entry. This is where the complete update lives, including the written post, photos, videos, and any other media connected to that stage of development.",
+
+  "[{image02.jpg}]",
+
+  "At the bottom of each entry are navigation links for Previous Entry, Back to Devlog, and Next Entry. These make it easy to move through the development history without returning to the main page after every post.",
+
+  "[{image03.jpg}]",
+
+  "The main Devlog page is intentionally limited to the newest five entries. Older updates can still be found through the Devlog Archive, which keeps the full development history available in one place.",
+
+  "[{image04.jpg}]",
+
+  "The Archive is organized by date and allows older posts to be opened just like the newest updates. Nothing disappears when it leaves the front page; it simply becomes part of the project history.",
+
+  "[{image05.jpg}]",
+
+  "The KCEA homepage also now includes a Latest News section. This always points to the newest devlog entry, making it easy to see what has changed since the last visit.",
+
+  "[{image06.jpg}]",
+
+  "As development continues, the Devlog will become the primary place for progress updates. New hardware revisions, controller work, software development, manufacturing progress, testing, and major milestones will all be documented here."
+]
+}
