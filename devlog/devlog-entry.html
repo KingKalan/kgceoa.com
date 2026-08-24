@@ -215,7 +215,7 @@
       box-shadow:var(--shadow);
     }
 
-    .hero-video{
+    .hero-image{
       display:block;
       width:100%;
       height:100%;
@@ -385,7 +385,7 @@
       nav{justify-content:flex-start}
       .entry-shell{padding-top:54px}
       .hero-media,
-      .hero-video{min-height:260px}
+      .hero-image{min-height:260px}
       .article-image-wrap,
       .article-video-wrap{width:100%; margin-left:0; margin-right:0; transform:none}
 
@@ -430,7 +430,7 @@
       <nav aria-label="Main navigation">
         <a href="/">Home</a>
         <a href="/projects.html">Projects</a>
-        <a href="/devlog/devlog.html" aria-current="page">Devlog</a>
+        <a href="/devlog.html" aria-current="page">Devlog</a>
         <a href="/about.html">About</a>
       </nav>
     </header>
@@ -630,21 +630,14 @@
       const media = document.createElement("div");
       media.className = "hero-media";
 
-      const video = document.createElement("video");
-      video.className = "hero-video";
-      video.autoplay = true;
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.preload = "metadata";
+      const image = document.createElement("img");
+      image.className = "hero-image";
+      image.src = `${DEVLOG_ROOT}/${folderName}/hero.gif`;
+      image.alt = "";
+      image.decoding = "async";
 
-      const source = document.createElement("source");
-      source.src = `${DEVLOG_ROOT}/${folderName}/banner.mp4`;
-      source.type = "video/mp4";
-      video.appendChild(source);
-
-      video.addEventListener("error", () => media.remove());
-      media.appendChild(video);
+      image.addEventListener("error", () => media.remove());
+      media.appendChild(image);
       shell.appendChild(media);
 
       const banner = content.banner || {};
@@ -697,7 +690,7 @@
 
       const back = document.createElement("a");
       back.className = "entry-nav-link entry-nav-back";
-      back.href = "/devlog/devlog.html";
+      back.href = "/devlog.html";
       back.textContent = "Back to Devlog";
       entryNav.appendChild(back);
 

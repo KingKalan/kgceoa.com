@@ -337,7 +337,7 @@
         #0c1220;
     }
 
-    .card-video{
+    .card-image{
       position:absolute;
       inset:0;
       width:100%;
@@ -637,21 +637,14 @@
       const media = document.createElement("div");
       media.className = "card-media";
 
-      const video = document.createElement("video");
-      video.className = "card-video";
-      video.autoplay = true;
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.preload = "metadata";
-      video.setAttribute("aria-hidden", "true");
+      const image = document.createElement("img");
+      image.className = "card-image";
+      image.src = `${DEVLOG_ROOT}/${folderName}/banner.gif`;
+      image.alt = "";
+      image.decoding = "async";
+      image.setAttribute("aria-hidden", "true");
 
-      const source = document.createElement("source");
-      source.src = `${DEVLOG_ROOT}/${folderName}/banner.mp4`;
-      source.type = "video/mp4";
-      video.appendChild(source);
-
-      video.addEventListener("error", () => video.remove());
+      image.addEventListener("error", () => image.remove());
 
       const banner = content.banner || {};
       const bannerCopy = document.createElement("div");
@@ -665,7 +658,7 @@
         createTextElement("p", "banner-text", banner.text || "")
       );
 
-      media.appendChild(video);
+      media.appendChild(image);
       media.appendChild(bannerCopy);
 
       article.appendChild(copy);

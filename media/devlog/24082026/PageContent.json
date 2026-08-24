@@ -1,22 +1,12 @@
 {
-  "header": "Just a test push to the website",
-  "description": "Just testing a new app for creating devlogs and pushing to github.",
+  "header": "Getting the DevLog Builder app aligned with the website",
+  "description": "going through and making some changes to the system for devlogs, also refining the devlog builder app that gets this shit done",
   "banner": {
     "header": "Current Milestone",
-    "text": "get this bitch to work"
+    "text": ""
   },
-  "category": "WebPage",
+  "category": "Hardware",
   "readTime": "1 min",
-  "tags": [
-    "WebPage"
-  ],
-  "body": [
-    "[{image01.png}]",
-    "just trying to get this to push to github.",
-    "[{image02.png}]",
-    "jjst got to make sure it does its job correctly",
-    "[{image03.png}]",
-    "then if it isnt i got to go back and fix that",
-    "[{image04.png}]"
-  ]
+  "tags": [],
+  "body": []
 }
