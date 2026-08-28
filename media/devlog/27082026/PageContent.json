@@ -1,0 +1,49 @@
+{
+  "header": "Parts are Here",
+  "description": "Got the remaining pieces of the dev cart delivered. The second iteration of the PCB for the controller have arrived as well.",
+  "banner": {
+    "header": "Current Milestone",
+    "text": "Revisit the controller and tune the preformance of this version."
+  },
+  "category": "Hardware",
+  "readTime": "2 min",
+  "tags": [
+    "Controller",
+    "Dev Cart"
+  ],
+  "body": [
+    "Over the past couple of weeks I've been getting components in for the dev cart and a few extras.",
+    "[{image01.jpg}]",
+    "Got the SUNLU CMYK+W Kit. With this I can mix nearly any color I want for the color of my prints. I'll more than likely use the model viewer page to select colors.",
+    "[{image02.jpg}]",
+    "[{image03.jpg}]",
+    "I had initially ordered everything on mouser.com, but the NOR flash was on back order. So i ordered it on DigiKey.com and it came in yesterday.",
+    "[{image08.jpg}]",
+    "These are the break out boards for the flash and SRAM chips.",
+    "[{image09.jpg}]",
+    "Here they are in the break out boards and those in the breadboard.",
+    "[{image12.jpg}]",
+    "So when I purchased the dev cart parts on mouser.com I purchased everything including the RP2040 parts. For the dev build I'll be using just a standard RP Pico board.",
+    "[{image13.jpg}]",
+    "[{image14.jpg}]",
+    "[{image15.jpg}]",
+    "[{image16.jpg}]",
+    "Here's the RP Pico, this is what I'll be using for the dev build.",
+    "[{image17.jpg}]",
+    "Here is the second version of the controller board. This version has a few changes from the first version. Up front, the solder mask is now black, and the silkscreen is yellow.",
+    "[{image18.jpg}]",
+    "Comparing it to version 1, you can see that the JST connector has now moved to the front and rotated orientation. It is also the correct JST connector this time as well. The button contacts changed from interdigitized to half moons, and they got a layer of carbon ink to coat it. In version 1, a few of the buttons were incorrectly placed in the bitstream, those have changed but will need testing to confirm that issue was corrected.",
+    "[{image19.jpg}]",
+    "[{image20.jpg}]",
+    "The shoulder button hinge pins came in, they require a few mods in the shell designs to fit better. This is more of a personal preference than a mechanical requirement, however.",
+    "[{image21.jpg}]",
+    "The dsPIC33 that was selected for the APU unit and its DIP socket are here. This will be part of the main motherboard build of the console.",
+    "[{image22.jpg}]",
+    "[{image23.jpg}]",
+    "Ran into a couple of side quests along the way. First, the clear SNES shell. I got some ideas on how I want it to turn out, once it's finished I'll post the completed conversion.",
+    "[{image04.jpg}]",
+    "[{image06.jpg}]",
+    "Side quest 2, I got a larger FPGA Dev-Board in case the other isn't large enough. But, I also got a 3.2 in. touch screen to play around with. Not entirely sure what im going to do with it at this point but defintely thinking about a few things.",
+    "[{image07.jpg}]"
+  ]
+}
